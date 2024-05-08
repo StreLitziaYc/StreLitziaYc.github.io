@@ -14,22 +14,24 @@
   
 
   
-  <title>关于我 | 槲寄生</title>
+  <title>在非Spring管理的类中注入Bean | 槲寄生</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
-  <meta name="description" content="为什么写这个博客 想要记录一些自己在学习过程中踩的坑，尤其是查了好久才解决的，希望能够在让其他人在学习过程中少一些烦恼 对自己的监督，接下来的这段时间，我所做的一切，应该不会再有其他人监督我了，希望我能够每天坚持学习 把这里当一个树洞，可能会有一些碎碎念写在这里吧，因为这里大概是不会再有其他人看到了。  目前想到的大概就这么多吧，以后想到啥再写吧">
-<meta property="og:type" content="website">
-<meta property="og:title" content="关于我">
-<meta property="og:url" content="https://strelitziayc.github.io/about/index.html">
+  <meta name="description" content="在Spring管理的类中注入Bean对象非常容易，只需使用@Autowired或者@Resource注解即可，但是在非Spring管理的对象中，注入Bean对象却没这么简单。  这时，我们就需要自己写一个工具类了，实现很简单，代码如下： 12345678910111213141516171819202122232425262728293031323334353637383940414243444">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在非Spring管理的类中注入Bean">
+<meta property="og:url" content="https://strelitziayc.github.io/2024/05/08/%E5%9C%A8%E9%9D%9ESpring%E7%AE%A1%E7%90%86%E7%9A%84%E7%B1%BB%E4%B8%AD%E6%B3%A8%E5%85%A5Bean/index.html">
 <meta property="og:site_name" content="槲寄生">
-<meta property="og:description" content="为什么写这个博客 想要记录一些自己在学习过程中踩的坑，尤其是查了好久才解决的，希望能够在让其他人在学习过程中少一些烦恼 对自己的监督，接下来的这段时间，我所做的一切，应该不会再有其他人监督我了，希望我能够每天坚持学习 把这里当一个树洞，可能会有一些碎碎念写在这里吧，因为这里大概是不会再有其他人看到了。  目前想到的大概就这么多吧，以后想到啥再写吧">
+<meta property="og:description" content="在Spring管理的类中注入Bean对象非常容易，只需使用@Autowired或者@Resource注解即可，但是在非Spring管理的对象中，注入Bean对象却没这么简单。  这时，我们就需要自己写一个工具类了，实现很简单，代码如下： 12345678910111213141516171819202122232425262728293031323334353637383940414243444">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-22T06:30:01.000Z">
-<meta property="article:modified_time" content="2024-04-22T08:08:19.002Z">
+<meta property="article:published_time" content="2024-05-08T13:23:36.000Z">
+<meta property="article:modified_time" content="2024-05-08T13:28:45.232Z">
 <meta property="article:author" content="StreLitziaYc">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="工具类">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="槲寄生" type="application/atom+xml">
@@ -248,7 +250,9 @@
        
 
 
-<article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+<article id="post-在非Spring管理的类中注入Bean" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
    
   <div class="article-inner">
     <div class="article-main">
@@ -259,7 +263,7 @@
   
     
       <h1 class="p-name article-title" itemprop="headline name">
-        关于我
+        在非Spring管理的类中注入Bean
       </h1>
     
   
@@ -267,31 +271,31 @@
 
         <div class='meta-info-bar'>
           <div class="meta-info">
-  <time class="dt-published" datetime="2024-04-22T06:30:01.000Z" itemprop="datePublished">2024-04-22</time>
+  <time class="dt-published" datetime="2024-05-08T13:23:36.000Z" itemprop="datePublished">2024-05-08</time>
 </div>
           <div class="need-seperator meta-info">
             <div class="meta-cate-flex">
   
-    未分类 
+  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>
    
 </div>
   
           </div>
           <div class="wordcount need-seperator meta-info">
-            169 词 
+            1.2k 词 
           </div>
         </div>
         
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/" rel="tag">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="tag">工具类</a></li></ul>
+
       </header>
       <div class="e-content article-entry" itemprop="articleBody">
         
-          <h2 id="为什么写这个博客"><a href="#为什么写这个博客" class="headerlink" title="为什么写这个博客"></a>为什么写这个博客</h2><ul>
-<li>想要记录一些自己在学习过程中踩的坑，<strong>尤其是查了好久才解决的</strong>，希望能够在让其他人在学习过程中少一些烦恼</li>
-<li><strong>对自己的监督</strong>，接下来的这段时间，我所做的一切，应该不会再有其他人监督我了，希望我能够每天坚持学习</li>
-<li>把这里当一个树洞，可能会有一些碎碎念写在这里吧，<del>因为这里大概是不会再有其他人看到了。</del></li>
-</ul>
-<p>目前想到的大概就这么多吧，以后想到啥再写吧</p>
-
+          <blockquote>
+<p>在Spring管理的类中注入Bean对象非常容易，只需使用<code>@Autowired</code>或者<code>@Resource</code>注解即可，但是在非Spring管理的对象中，注入Bean对象却没这么简单。</p>
+</blockquote>
+<p>这时，我们就需要自己写一个工具类了，实现很简单，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.hmdp.utils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.BeansException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContextAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.lang.NonNull;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BeanHelper</span> <span class="keyword">implements</span> <span class="title class_">ApplicationContextAware</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ApplicationContext context;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setApplicationContext</span><span class="params">(<span class="meta">@NonNull</span> ApplicationContext applicationContext)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">        context = applicationContext;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据name获取Bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name Bean的名字</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Bean</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getBean</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> context.getBean(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据class获取bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> clazz 类型</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> &lt;T&gt; bean的类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(Class&lt;T&gt; clazz)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> context.getBean(clazz);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据name和class获取bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name 名字</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> clazz 类型</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> &lt;T&gt; bean的类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T <span class="title function_">getBean</span><span class="params">(String name, Class&lt;T&gt; clazz)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> context.getBean(name, clazz);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
         
       </div>
 
@@ -302,6 +306,29 @@
   </div>
   
     
+<nav id="article-nav">
+  <a class="article-nav-btn left  disabled "
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2024/04/25/%E5%85%B3%E4%BA%8E%E7%BC%93%E5%AD%98%E4%BC%9A%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E5%8F%8A%E5%85%B6Java%E5%AE%9E%E7%8E%B0/"
+      title="关于缓存会出现的一些问题及其Java实现"
+     >
+
+    <p class="title-text">
+      
+        关于缓存会出现的一些问题及其Java实现
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
 
   
 </article>
