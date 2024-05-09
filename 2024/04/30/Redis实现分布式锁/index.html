@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/04/30/e2883bac9c6cc3e3.png">
 <meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/04/30/1b6a74f71225c0f4.png">
 <meta property="article:published_time" content="2024-04-30T07:15:36.000Z">
-<meta property="article:modified_time" content="2024-05-09T08:09:59.667Z">
+<meta property="article:modified_time" content="2024-05-09T08:19:15.619Z">
 <meta property="article:author" content="StreLitziaYc">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="分布式锁">
@@ -295,7 +295,7 @@
   
           </div>
           <div class="wordcount need-seperator meta-info">
-            5.2k 词 
+            5.4k 词 
           </div>
         </div>
         
@@ -351,7 +351,7 @@
 <li><h4 id="超时释放-1"><a href="#超时释放-1" class="headerlink" title="超时释放"></a>超时释放</h4><p>  利用WathDog机制，当leaseTime为-1时，触发该机制。获取锁后，设置锁的过期时间史30s（可自行更改），之后每十秒钟检查一次锁是否被释放，若未释放则为这个锁续期10s（初始时间的1&#x2F;3），否则释放锁。当该服务器在上锁期间发生宕机，续期也无法完成，Redis内的锁就会被释放掉，从而避免了死锁。</p>
 </li>
 <li><h4 id="主从一致性问题-1"><a href="#主从一致性问题-1" class="headerlink" title="主从一致性问题"></a>主从一致性问题</h4><p>  使用多个主节点，只有当所有节点中都能够获取锁时，才真正获取到锁。这样即使有一个节点在保存锁时宕机，并且其从节点没有及时完成数据同步，其他线程在尝试获取锁时，只能或者当前节点的锁，其他节点依然无法获取，所以该线程依然无法访问临界资源，保证了并发安全。</p>
-</li>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">RLock</span> <span class="variable">lock1</span> <span class="operator">=</span> redissonClient.getLock(<span class="string">&quot;order&quot;</span>);</span><br><span class="line"><span class="type">RLock</span> <span class="variable">lock2</span> <span class="operator">=</span> redissonClien2.getLock(<span class="string">&quot;order&quot;</span>);</span><br><span class="line"><span class="type">RLock</span> <span class="variable">lock3</span> <span class="operator">=</span> redissonClient3.getLock(<span class="string">&quot;order&quot;</span>);</span><br><span class="line"><span class="type">RLock</span> <span class="variable">lock</span> <span class="operator">=</span> redissonClient.getMultiLock(lock1, lock2, lock3);</span><br></pre></td></tr></table></figure></li>
 </ul>
 
         
