@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/04/30/e2883bac9c6cc3e3.png">
 <meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/04/30/1b6a74f71225c0f4.png">
 <meta property="article:published_time" content="2024-04-30T07:15:36.000Z">
-<meta property="article:modified_time" content="2024-05-08T13:37:17.487Z">
+<meta property="article:modified_time" content="2024-05-09T08:09:59.667Z">
 <meta property="article:author" content="StreLitziaYc">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="分布式锁">
@@ -295,7 +295,7 @@
   
           </div>
           <div class="wordcount need-seperator meta-info">
-            4.7k 词 
+            5.2k 词 
           </div>
         </div>
         
@@ -334,7 +334,7 @@
 <li><h4 id="不可重入"><a href="#不可重入" class="headerlink" title="不可重入"></a>不可重入</h4>  同一个线程无法多次获取同一把锁</li>
 <li><h4 id="不可重试"><a href="#不可重试" class="headerlink" title="不可重试"></a>不可重试</h4>  获取锁只尝试一次就返回false，不能重试</li>
 <li><h4 id="超时释放"><a href="#超时释放" class="headerlink" title="超时释放"></a>超时释放</h4>  虽然这么做是为了防止死锁，但如果业务实践较长，则可能提前释放锁，存在安全隐患</li>
-<li><h4 id="主从一致性"><a href="#主从一致性" class="headerlink" title="主从一致性"></a>主从一致性</h4>  Redis并不提供主从集群</li>
+<li><h4 id="主从一致性问题"><a href="#主从一致性问题" class="headerlink" title="主从一致性问题"></a>主从一致性问题</h4>  主从集群中，如过保存有锁的master节点宕机，其数据并未同步到从节点的话，其他线程也可能获取到锁，从而导致并发安全问题</li>
 </ul>
 <h2 id="使用Redisson实现"><a href="#使用Redisson实现" class="headerlink" title="使用Redisson实现"></a>使用Redisson实现</h2><blockquote>
 <p>Redisson是架设在Redis基础上的一个Java驻内存数据网格（In-Memory Data Grid）。充分的利用了Redis键值数据库提供的一系列优势，基于Java实用工具包中常用接口，为使用者提供了一系列具有分布式特性的常用工具类。使得原本作为协调单机多线程并发程序的工具包获得了协调分布式多机多线程并发系统的能力，大大降低了设计和研发大规模分布式系统的难度。同时结合各富特色的分布式服务，更进一步简化了分布式环境中程序相互之间的协作。</p>
@@ -343,6 +343,16 @@
 <h3 id="代码实现-3"><a href="#代码实现-3" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RedissonLock</span> <span class="keyword">extends</span> <span class="title class_">ILock</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">RedissonClient</span> <span class="variable">redissonClient</span> <span class="operator">=</span> BeanHelper.getBean(RedissonClient.class);</span><br><span class="line">    <span class="keyword">private</span> RLock lock;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">RedissonLock</span><span class="params">(String lockName)</span> &#123;</span><br><span class="line">        lock = redissonClient.getLock(lockName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">tryLock</span><span class="params">(<span class="type">long</span> timeoutSec)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> lock.tryLock(-<span class="number">1</span>, timeoutSec, TimeUnit.SECONDS);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unlock</span><span class="params">()</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>因为这个类没有交给Spring进行管理，所以无法使用注解来注入<code>RedissonClient</code>，这里使用了自己写的一个工具类来进行注入，详情可以看这里，<a href="https://strelitziayc.github.io/2024/05/08/%E5%9C%A8%E9%9D%9ESpring%E7%AE%A1%E7%90%86%E7%9A%84%E7%B1%BB%E4%B8%AD%E6%B3%A8%E5%85%A5Bean/">在非Spring管理的类中注入Bean</a>。</p>
+<h3 id="Redisson对上述问题的解决"><a href="#Redisson对上述问题的解决" class="headerlink" title="Redisson对上述问题的解决"></a>Redisson对上述问题的解决</h3><ul>
+<li><h4 id="不可重入-1"><a href="#不可重入-1" class="headerlink" title="不可重入"></a>不可重入</h4><p>  Redisson提供的分布式锁实现是用Hash数据类型进行数据存储的，进行一次访问就对Hash的值加一，释放锁时减一，只有HashValue值为0时才删除Key</p>
+</li>
+<li><h4 id="不可重试-1"><a href="#不可重试-1" class="headerlink" title="不可重试"></a>不可重试</h4><p>  利用Redis的消息机制，只有在收到Key被删除的消息后，才会尝试进行获取锁，这样既能降低CPU压力，又能实现重试获取锁</p>
+</li>
+<li><h4 id="超时释放-1"><a href="#超时释放-1" class="headerlink" title="超时释放"></a>超时释放</h4><p>  利用WathDog机制，当leaseTime为-1时，触发该机制。获取锁后，设置锁的过期时间史30s（可自行更改），之后每十秒钟检查一次锁是否被释放，若未释放则为这个锁续期10s（初始时间的1&#x2F;3），否则释放锁。当该服务器在上锁期间发生宕机，续期也无法完成，Redis内的锁就会被释放掉，从而避免了死锁。</p>
+</li>
+<li><h4 id="主从一致性问题-1"><a href="#主从一致性问题-1" class="headerlink" title="主从一致性问题"></a>主从一致性问题</h4><p>  使用多个主节点，只有当所有节点中都能够获取锁时，才真正获取到锁。这样即使有一个节点在保存锁时宕机，并且其从节点没有及时完成数据同步，其他线程在尝试获取锁时，只能或者当前节点的锁，其他节点依然无法获取，所以该线程依然无法访问临界资源，保证了并发安全。</p>
+</li>
+</ul>
 
         
       </div>
