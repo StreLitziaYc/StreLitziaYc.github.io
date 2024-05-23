@@ -14,18 +14,23 @@
   
 
   
-  <title>目录: 数组 | 槲寄生</title>
+  <title>使用Redis优化用户点赞功能 | 槲寄生</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="槲寄生">
-<meta property="og:url" content="https://strelitziayc.github.io/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%95%B0%E7%BB%84/index.html">
+  <meta name="description" content="目前的点赞功能同一用户可以给同一篇博客多次点赞，且直接与数据库交互，代码如下： 1234567@PutMapping(&quot;&#x2F;like&#x2F;&#123;id&#125;&quot;)public Result likeBlog(@PathVariable(&quot;id&quot;) Long id) &#123;    &#x2F;&#x2F; 修改点赞数量    blogService.update()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Redis优化用户点赞功能">
+<meta property="og:url" content="https://strelitziayc.github.io/2024/05/23/%E4%BD%BF%E7%94%A8Redis%E4%BC%98%E5%8C%96%E7%94%A8%E6%88%B7%E7%82%B9%E8%B5%9E%E5%8A%9F%E8%83%BD/index.html">
 <meta property="og:site_name" content="槲寄生">
+<meta property="og:description" content="目前的点赞功能同一用户可以给同一篇博客多次点赞，且直接与数据库交互，代码如下： 1234567@PutMapping(&quot;&#x2F;like&#x2F;&#123;id&#125;&quot;)public Result likeBlog(@PathVariable(&quot;id&quot;) Long id) &#123;    &#x2F;&#x2F; 修改点赞数量    blogService.update()">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-05-23T13:13:24.000Z">
+<meta property="article:modified_time" content="2024-05-23T16:59:50.063Z">
 <meta property="article:author" content="StreLitziaYc">
+<meta property="article:tag" content="Redis">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="槲寄生" type="application/atom+xml">
@@ -259,44 +264,126 @@
     <div id="content-body">
        
 
-<div class="archive-main-card">
-    <div class="archive-top">
-      <div class="main-title-bar">
-        <div class="main-title-dot"></div>
-        <h1 class="article-title">归档</h1>
-      </div>    
+
+<article id="post-使用Redis优化用户点赞功能" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        使用Redis优化用户点赞功能
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-05-23T13:13:24.000Z" itemprop="datePublished">2024-05-23</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            2.4k 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <h2 id="目前的点赞功能"><a href="#目前的点赞功能" class="headerlink" title="目前的点赞功能"></a>目前的点赞功能</h2><p>同一用户可以给同一篇博客多次点赞，且直接与数据库交互，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PutMapping(&quot;/like/&#123;id&#125;&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">likeBlog</span><span class="params">(<span class="meta">@PathVariable(&quot;id&quot;)</span> Long id)</span> &#123;</span><br><span class="line">    <span class="comment">// 修改点赞数量</span></span><br><span class="line">    blogService.update()</span><br><span class="line">            .setSql(<span class="string">&quot;liked = liked + 1&quot;</span>).eq(<span class="string">&quot;id&quot;</span>, id).update();</span><br><span class="line">    <span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="希望实现的效果"><a href="#希望实现的效果" class="headerlink" title="希望实现的效果"></a>希望实现的效果</h2><ul>
+<li>一个用户只能给一篇博客点赞一次，再次点赞则取消带你赞</li>
+<li>如果当前用户已经点赞，则点赞按钮高亮显示（前端已实现，判断字段<code>Blog</code>类的<code>isLike</code>属性）</li>
+</ul>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ol>
+<li>给<code>Blog</code>类中添加一个<code>isLike</code>字段，标示是否已经被当前用户点赞</li>
+<li>修改点赞功能，利用Redis的set集合判断是否点赞过，是则点赞数+1，否则减一</li>
+<li>修改根据<code>id</code>查询<code>Blog</code>的业务，判断当前登录用户是否点赞过，赋值给<code>isLike</code>字段</li>
+<li>修改分页查询<code>Blog</code>的业务，判断当前登录用户是否点赞过，赋值给<code>isLike</code>字段</li>
+</ol>
+<h2 id="新增isLike字段"><a href="#新增isLike字段" class="headerlink" title="新增isLike字段"></a>新增<code>isLike</code>字段</h2><p>因为该字段不在数据库中，所以应该添加注解<br><em>注：此处更加优雅的写法应该是创建一个新的<code>BlogVO</code></em></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 是否点赞过了</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@TableField(exist = false)</span></span><br><span class="line"><span class="keyword">private</span> Boolean isLike;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改点赞功能"><a href="#修改点赞功能" class="headerlink" title="修改点赞功能"></a>修改点赞功能</h2><p>点赞功能修改流程如下：</p>
+<ol>
+<li>获取当前用户</li>
+<li>判断当前用户是否已经点赞</li>
+<li>如果未点赞<ol>
+<li>数据库点赞数+1</li>
+<li>保存用户到Redis的set集合</li>
+</ol>
+</li>
+<li>如果已点赞<ol>
+<li>数据库-1</li>
+<li>把用户从Redis的set中删除<br>代码实现：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">likeBlog</span><span class="params">(Long blogId)</span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前用户</span></span><br><span class="line">    <span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> UserHolder.getUser().getId();</span><br><span class="line">    <span class="comment">// 判断是否已点赞</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.BLOG_LIKED_KEY + blogId;</span><br><span class="line">    <span class="type">Boolean</span> <span class="variable">isLiked</span> <span class="operator">=</span> redisTemplate.opsForSet().isMember(key, userId.toString());</span><br><span class="line">    <span class="keyword">if</span> (BooleanUtil.isFalse(isLiked)) &#123;</span><br><span class="line">        <span class="comment">// 数据库+1</span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> lambdaUpdate().setSql(<span class="string">&quot;liked = liked + 1&quot;</span>).eq(Blog::getId, blogId).update();</span><br><span class="line">        <span class="comment">// 更新Redis</span></span><br><span class="line">        <span class="keyword">if</span> (success) &#123;</span><br><span class="line">            redisTemplate.opsForSet().add(key, userId.toString());</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">MySqlException</span>(MessageConstant.LIKE_FAILED);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 数据库-1</span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> lambdaUpdate().setSql(<span class="string">&quot;liked = liked - 1&quot;</span>).eq(Blog::getId, blogId).update();</span><br><span class="line">        <span class="comment">// 更新Redis</span></span><br><span class="line">        <span class="keyword">if</span> (success) &#123;</span><br><span class="line">            redisTemplate.opsForSet().remove(key, userId.toString());</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">MySqlException</span>(MessageConstant.LIKE_FAILED);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h2 id="修改根据id查询"><a href="#修改根据id查询" class="headerlink" title="修改根据id查询"></a>修改根据<code>id</code>查询</h2><p>只需在查询时，多在Redis中查询一次是否点赞</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Blog <span class="title function_">queryById</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="type">Blog</span> <span class="variable">blog</span> <span class="operator">=</span> getById(id);</span><br><span class="line">    queryBlogUser(blog);</span><br><span class="line">    setIsLiked(blog);</span><br><span class="line">    <span class="keyword">return</span> blog;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setIsLiked</span><span class="params">(Blog blog)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.BLOG_LIKED_KEY + blog.getId();</span><br><span class="line">    <span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> UserHolder.getUser().getId();</span><br><span class="line">    <span class="type">Boolean</span> <span class="variable">isLiked</span> <span class="operator">=</span> redisTemplate.opsForSet().isMember(key, userId.toString());</span><br><span class="line">    blog.setIsLike(isLiked);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>这么写有一个bug，用户在未登录时，加载首页的博客信息时，也会去查询当前用户是否点赞，但<code>UserHolder.getUser()</code>返回值为<code>null</code>，所以此处会抛出<code>NullPointerException</code></strong><br>修改如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setIsLiked</span><span class="params">(Blog blog)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.BLOG_LIKED_KEY + blog.getId();</span><br><span class="line">    <span class="comment">// 处理用户未登录的情况</span></span><br><span class="line">    <span class="keyword">if</span> (UserHolder.getUser() == <span class="literal">null</span>) <span class="keyword">return</span>;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> UserHolder.getUser().getId();</span><br><span class="line">    <span class="type">Boolean</span> <span class="variable">isLiked</span> <span class="operator">=</span> redisTemplate.opsForSet().isMember(key, userId.toString());</span><br><span class="line">    blog.setIsLike(isLiked);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>分页查询同理，就不再赘述了</p>
+
+        
+      </div>
+
+         
     </div>
     
-    
-      
-      
-        
-        <div class="year-line">
-            <div class="year-num">2024</div>
-            <div class="dot-wrapper">
-                <div class="dot"></div>
-            </div>
-            <div class="article-count">1 篇文章</div>
-        </div>
-      
-      <a class="archive-article-link" href="/2024/05/10/%E4%BA%8C%E5%88%86%E6%B3%95%E7%9A%84%E5%90%84%E7%A7%8D%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE/" title="二分法的各种灵魂拷问">
-        <div class="date">05-10</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    二分法的各种灵魂拷问
-                
-            </div>
-        </div>
-        <div class="tags">
-            #二分法 #手撕算法
-        </div>
-      </a>
-    
+     
   </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left  disabled "
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2024/05/18/%E4%BD%BF%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%B7%B1%E7%9A%84%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"
+      title="使用Redis实现自己的消息队列"
+     >
+
+    <p class="title-text">
+      
+        使用Redis实现自己的消息队列
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+
+
+
     </div>
     <div id="footer-wrapper">
       <footer id="footer">
