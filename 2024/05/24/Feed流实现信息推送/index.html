@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+
+<html theme="dark" showBanner="true" hasBanner="true" > 
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet">
+<script src="/js/color.global.min.js" ></script>
+<script src="/js/load-settings.js" ></script>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+
+  
+  <title>Feed流实现信息推送 | 槲寄生</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+  <meta name="description" content="什么是Feed流？ 关注推送也叫做Feed流，直译为投喂。为用户持续的提供“沉浸式”的体验，通过无限下拉刷新获取新的信息。  Feed流和传统模式的区别如下Feed流主要有三种实现方案  拉模式 推模式 推拉结合  拉模式又叫做读扩散，在用户需要读取消息时，主动从发件箱拉取消息，然后把获取到的消息进行排序，并呈现给用户。流程如图：优点：消息只用保存一份，节约内存缺点：大量消息被拉去的话，用户的性能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Feed流实现信息推送">
+<meta property="og:url" content="https://strelitziayc.github.io/2024/05/24/Feed%E6%B5%81%E5%AE%9E%E7%8E%B0%E4%BF%A1%E6%81%AF%E6%8E%A8%E9%80%81/index.html">
+<meta property="og:site_name" content="槲寄生">
+<meta property="og:description" content="什么是Feed流？ 关注推送也叫做Feed流，直译为投喂。为用户持续的提供“沉浸式”的体验，通过无限下拉刷新获取新的信息。  Feed流和传统模式的区别如下Feed流主要有三种实现方案  拉模式 推模式 推拉结合  拉模式又叫做读扩散，在用户需要读取消息时，主动从发件箱拉取消息，然后把获取到的消息进行排序，并呈现给用户。流程如图：优点：消息只用保存一份，节约内存缺点：大量消息被拉去的话，用户的性能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/05/24/87d23404b4ef925f.png">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/05/24/9442517574e6772b.png">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/05/24/7f395cc7efc14f52.png">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/05/24/42749c1f72ba8e07.png">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/05/25/50fd938000530894.png">
+<meta property="article:published_time" content="2024-05-24T11:40:26.000Z">
+<meta property="article:modified_time" content="2024-05-26T07:43:07.618Z">
+<meta property="article:author" content="StreLitziaYc">
+<meta property="article:tag" content="Reids">
+<meta property="article:tag" content="Feed流">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.bmp.ovh/imgs/2024/05/24/87d23404b4ef925f.png">
+  
+    <link rel="alternate" href="/atom.xml" title="槲寄生" type="application/atom+xml">
+  
+  
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-32.png" sizes="32x32">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-128.png" sizes="128x128">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-180.png" sizes="180x180">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-192.png" sizes="192x192">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-32.png" sizes="32x32">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-128.png" sizes="128x128">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-180.png" sizes="180x180">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-192.png" sizes="192x192">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+<body>
+  
+  
+    
+<div id="banner" class="">
+  <img src="https://s3.bmp.ovh/imgs/2024/04/26/2dc786326e755978.jpg" itemprop="image">
+  <div id="banner-dim"></div>
+</div>
+ 
+   
+  <div id="main-grid" class="  ">
+    <div id="nav" class=""  >
+      <navbar id="navbar">
+  <nav id="title-nav">
+    <a href="/">
+      <div id="vivia-logo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div>槲寄生 </div>
+    </a>
+  </nav>
+  <nav id="main-nav">
+    
+      <a class="main-nav-link" href="/">Home</a>
+    
+      <a class="main-nav-link" href="/archives">Archives</a>
+    
+      <a class="main-nav-link" href="/about">About</a>
+    
+  </nav>
+  <nav id="sub-nav">
+    <a id="theme-btn" class="nav-icon">
+      <span class="light-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M438.5-829.913v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-829.913Zm0 747.826v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-82.087ZM877.913-438.5h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537t29.476-12.174h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T877.913-438.5Zm-747.826 0h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T82.087-521.5h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T130.087-438.5Zm660.174-290.87-34.239 32q-12.913 12.674-29.565 12.174-16.653-.5-29.327-13.174-12.674-12.673-12.554-28.826.12-16.152 12.794-28.826l33-35q12.913-12.674 30.454-12.674t30.163 12.847q12.709 12.846 12.328 30.826-.38 17.98-13.054 30.653ZM262.63-203.978l-32 34q-12.913 12.674-30.454 12.674t-30.163-12.847q-12.709-12.846-12.328-30.826.38-17.98 13.054-30.653l33.239-31q12.913-12.674 29.565-12.174 16.653.5 29.327 13.174 12.674 12.673 12.554 28.826-.12 16.152-12.794 28.826Zm466.74 33.239-32-33.239q-12.674-12.913-12.174-29.565.5-16.653 13.174-29.327 12.673-12.674 28.826-13.054 16.152-.38 28.826 12.294l35 33q12.674 12.913 12.674 30.454t-12.847 30.163q-12.846 12.709-30.826 12.328-17.98-.38-30.653-13.054ZM203.978-697.37l-34-33q-12.674-12.913-13.174-29.945-.5-17.033 12.174-29.707t31.326-13.293q18.653-.62 31.326 13.054l32 34.239q11.674 12.913 11.174 29.565-.5 16.653-13.174 29.327-12.673 12.674-28.826 12.554-16.152-.12-28.826-12.794ZM480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm-.247-82q65.703 0 111.475-46.272Q637-414.544 637-480.247t-45.525-111.228Q545.95-637 480.247-637t-111.475 45.525Q323-545.95 323-480.247t45.525 111.975Q414.05-322 479.753-322ZM481-481Z"/></svg></span>
+      <span class="dark-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480.239-116.413q-152.63 0-258.228-105.478Q116.413-327.37 116.413-480q0-130.935 77.739-227.435t206.304-125.043q43.022-9.631 63.87 10.869t3.478 62.805q-8.891 22.043-14.315 44.463-5.424 22.42-5.424 46.689 0 91.694 64.326 155.879 64.325 64.186 156.218 64.186 24.369 0 46.978-4.946 22.609-4.945 44.413-14.076 42.826-17.369 62.967 1.142 20.142 18.511 10.511 61.054Q807.174-280 712.63-198.206q-94.543 81.793-232.391 81.793Zm0-95q79.783 0 143.337-40.217 63.554-40.218 95.793-108.283-15.608 4.044-31.097 5.326-15.49 1.283-31.859.805-123.706-4.066-210.777-90.539-87.071-86.473-91.614-212.092-.24-16.369.923-31.978 1.164-15.609 5.446-30.978-67.826 32.478-108.282 96.152Q211.652-559.543 211.652-480q0 111.929 78.329 190.258 78.329 78.329 190.258 78.329ZM466.13-465.891Z"/></svg></span>
+    </a>
+    
+      <a id="nav-rss-link" class="nav-icon mobile-hide" href="/atom.xml" title="RSS 订阅">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M198-120q-25.846 0-44.23-18.384-18.384-18.385-18.384-44.23 0-25.846 18.384-44.23 18.384-18.385 44.23-18.385 25.846 0 44.23 18.385 18.384 18.384 18.384 44.23 0 25.845-18.384 44.23Q223.846-120 198-120Zm538.385 0q-18.846 0-32.923-13.769-14.076-13.769-15.922-33.23-8.692-100.616-51.077-188.654-42.385-88.039-109.885-155.539-67.5-67.501-155.539-109.885Q283-663.462 182.385-672.154q-19.461-1.846-33.23-16.23-13.769-14.385-13.769-33.846t14.076-32.922q14.077-13.461 32.923-12.23 120.076 8.692 226.038 58.768 105.961 50.077 185.73 129.846 79.769 79.769 129.846 185.731 50.077 105.961 58.769 226.038 1.231 18.846-12.538 32.922Q756.461-120 736.385-120Zm-252 0q-18.231 0-32.423-13.461t-18.653-33.538Q418.155-264.23 348.886-333.5q-69.27-69.27-166.501-84.423-20.077-4.462-33.538-18.961-13.461-14.5-13.461-33.346 0-19.076 13.884-33.23 13.884-14.153 33.115-10.922 136.769 15.384 234.384 112.999 97.615 97.615 112.999 234.384 3.231 19.23-10.538 33.115Q505.461-120 484.385-120Z"/></svg>
+      </a>
+    
+    <div id="nav-menu-btn" class="nav-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M177.37-252.282q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Zm0-186.218q-17.453 0-29.477-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T177.37-521.5h605.26q17.453 0 29.477 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T782.63-438.5H177.37Zm0-186.217q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Z"/></svg>
+    </div>
+  </nav>
+</navbar>
+<div id="nav-dropdown" class="hidden">
+  <div id="dropdown-link-list">
+    
+      <a class="nav-dropdown-link" href="/">Home</a>
+    
+      <a class="nav-dropdown-link" href="/archives">Archives</a>
+    
+      <a class="nav-dropdown-link" href="/about">About</a>
+    
+    
+      <a class="nav-dropdown-link" href="/atom.xml" title="RSS 订阅">RSS</a>
+     
+    </div>
+</div>
+<script>
+  let dropdownBtn = document.getElementById("nav-menu-btn");
+  let dropdownEle = document.getElementById("nav-dropdown");
+  dropdownBtn.onclick = function() {
+    dropdownEle.classList.toggle("hidden");
+  }
+</script>
+    </div>
+    <div id="sidebar-wrapper">
+      <sidebar id="sidebar">
+  
+    <div class="widget-wrap">
+  <div class="info-card">
+    <div class="avatar">
+      
+        <image src=https://s3.bmp.ovh/imgs/2024/04/26/b924f8732fca3581.jpg></image>
+      
+      <div class="img-dim"></div>
+    </div>
+    <div class="info">
+      <div class="username">StreLitziaYc </div>
+      <div class="dot"></div>
+      <div class="subtitle">沉淀 </div>
+      <div class="link-list">
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://github.com/StreLitziaYc" title="GitHub"><i class="fa-brands fa-github"></i></a>
+        
+          <a class="link-btn" href="mailto:strelitziayc@qq.com" title="Mail"><i class="fa-solid fa-envelope"></i></a>
+         
+      </div>  
+    </div>
+  </div>
+</div>
+
+  
+  <div class="sticky">
+    
+      
+
+
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">分类</h3>
+      <div class="category-box">
+            <a class="category-link" href="/categories/%E6%9D%82%E8%B0%88/">
+                杂谈
+                <div class="category-count">1</div>
+            </a>
+        
+            <a class="category-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+                Java学习笔记
+                <div class="category-count">8</div>
+            </a>
+        <div class="children"><div class="category-box">
+            <a class="category-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">
+                黑马点评
+                <div class="category-count">7</div>
+            </a>
+        </div></div>
+            <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+                算法学习笔记
+                <div class="category-count">1</div>
+            </a>
+        <div class="children"><div class="category-box">
+            <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%95%B0%E7%BB%84/">
+                数组
+                <div class="category-count">1</div>
+            </a>
+        </div></div></div>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">标签</h3>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Feed%E6%B5%81/" rel="tag">Feed流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/JUC/" rel="tag">JUC</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Reids/" rel="tag">Reids</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Session/" rel="tag">Session</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Spring/" rel="tag">Spring</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E4%BA%8C%E5%88%86%E6%B3%95/" rel="tag">二分法</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag">分布式锁</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="tag">工具类</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%89%8B%E6%92%95%E7%AE%97%E6%B3%95/" rel="tag">手撕算法</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag">消息队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/" rel="tag">碎碎念</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%BC%93%E5%AD%98/" rel="tag">缓存</a></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">归档</h3>
+      
+      
+        <a class="archive-link" href="/archives/2024/05 ">
+          五月 2024 
+          <div class="archive-count">6 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2024/04 ">
+          四月 2024 
+          <div class="archive-count">4 </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">最新文章</h3>
+      <ul>
+        
+          <a class="recent-link" href="/2024/05/24/Feed%E6%B5%81%E5%AE%9E%E7%8E%B0%E4%BF%A1%E6%81%AF%E6%8E%A8%E9%80%81/" title="Feed流实现信息推送" >
+            <div class="recent-link-text">
+              Feed流实现信息推送
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2024/05/24/%E4%BD%BF%E7%94%A8ZSET%E5%AE%9E%E7%8E%B0topN%E7%82%B9%E8%B5%9E%E6%8E%92%E8%A1%8C/" title="使用ZSET实现topN点赞排行" >
+            <div class="recent-link-text">
+              使用ZSET实现topN点赞排行
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2024/05/23/%E4%BD%BF%E7%94%A8Redis%E4%BC%98%E5%8C%96%E7%94%A8%E6%88%B7%E7%82%B9%E8%B5%9E%E5%8A%9F%E8%83%BD/" title="使用Redis优化用户点赞功能" >
+            <div class="recent-link-text">
+              使用Redis优化用户点赞功能
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2024/05/18/%E4%BD%BF%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%B7%B1%E7%9A%84%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" title="使用Redis实现自己的消息队列" >
+            <div class="recent-link-text">
+              使用Redis实现自己的消息队列
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2024/05/10/%E4%BA%8C%E5%88%86%E6%B3%95%E7%9A%84%E5%90%84%E7%A7%8D%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE/" title="二分法的各种灵魂拷问" >
+            <div class="recent-link-text">
+              二分法的各种灵魂拷问
+            </div>
+          </a>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+  </div>
+</sidebar>
+    </div>
+    <div id="content-body">
+       
+
+
+<article id="post-Feed流实现信息推送" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        Feed流实现信息推送
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-05-24T11:40:26.000Z" itemprop="datePublished">2024-05-24</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            2.8k 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Feed%E6%B5%81/" rel="tag">Feed流</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Reids/" rel="tag">Reids</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <h2 id="什么是Feed流？"><a href="#什么是Feed流？" class="headerlink" title="什么是Feed流？"></a>什么是Feed流？</h2><blockquote>
+<p>关注推送也叫做Feed流，直译为<em>投喂</em>。为用户持续的提供“沉浸式”的体验，通过无限下拉刷新获取新的信息。</p>
+</blockquote>
+<p><strong>Feed流和传统模式的区别如下</strong><br><img src="https://s3.bmp.ovh/imgs/2024/05/24/87d23404b4ef925f.png" alt="Feed流对比传统模式"><br><strong>Feed流主要有三种实现方案</strong></p>
+<ul>
+<li>拉模式</li>
+<li>推模式</li>
+<li>推拉结合</li>
+</ul>
+<h2 id="拉模式"><a href="#拉模式" class="headerlink" title="拉模式"></a>拉模式</h2><p>又叫做<strong>读扩散</strong>，在用户需要读取消息时，主动从发件箱拉取消息，然后把获取到的消息进行排序，并呈现给用户。流程如图：<br><img src="https://s3.bmp.ovh/imgs/2024/05/24/9442517574e6772b.png" alt="拉模式"><br><strong>优点</strong>：消息只用保存一份，节约内存<br><strong>缺点</strong>：大量消息被拉去的话，用户的性能消耗较大</p>
+<h2 id="推模式"><a href="#推模式" class="headerlink" title="推模式"></a>推模式</h2><p>又叫做<strong>写扩散</strong>，用户发布消息后，就直接推送到粉丝的收件箱里。流程如图：<br><img src="https://s3.bmp.ovh/imgs/2024/05/24/7f395cc7efc14f52.png" alt="推模式"><br><strong>优点</strong>：延时低，用户可以很快以较低成本获取到信息<br><strong>缺点</strong>：对于内存的负担大，因为一份消息需要被存储很多份</p>
+<h2 id="推拉结合模式"><a href="#推拉结合模式" class="headerlink" title="推拉结合模式"></a>推拉结合模式</h2><p>又叫做<strong>读写混合</strong>，兼具两种模式的优点。对于普通粉丝，采用拉模式；对于活跃粉丝，采用推模式。如图所示：<br><img src="https://s3.bmp.ovh/imgs/2024/05/24/42749c1f72ba8e07.png" alt="推拉结合"></p>
+<h2 id="三种模式对比"><a href="#三种模式对比" class="headerlink" title="三种模式对比"></a>三种模式对比</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>拉模式</th>
+<th>推模式</th>
+<th>推拉结合</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>写比例</strong></td>
+<td>低</td>
+<td>高</td>
+<td>中</td>
+</tr>
+<tr>
+<td><strong>读比例</strong></td>
+<td>高</td>
+<td>低</td>
+<td>中</td>
+</tr>
+<tr>
+<td><strong>用户读取延迟</strong></td>
+<td>高</td>
+<td>低</td>
+<td>低</td>
+</tr>
+<tr>
+<td><strong>实现难度</strong></td>
+<td>复杂</td>
+<td>简单</td>
+<td>很复杂</td>
+</tr>
+<tr>
+<td><strong>使用场景</strong></td>
+<td>很少使用</td>
+<td>用户量少、没有大V</td>
+<td>过千万的用户量，有大V</td>
+</tr>
+</tbody></table>
+<h2 id="基于Redis实现推模式"><a href="#基于Redis实现推模式" class="headerlink" title="基于Redis实现推模式"></a>基于Redis实现推模式</h2><p><strong>需求</strong></p>
+<ul>
+<li>在保存blog到数据库的同时，推送到粉丝的收件箱</li>
+<li>收件箱满足可以根据时间戳排序</li>
+<li>查询收件箱数据时，可以分页查询</li>
+</ul>
+<h3 id="推送的具体实现"><a href="#推送的具体实现" class="headerlink" title="推送的具体实现"></a>推送的具体实现</h3><p>用户发布博客后，在保存到数据库的同时，保存到Redis中的ZSET中，key是每个粉丝的id。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> Long <span class="title function_">saveBlog</span><span class="params">(Blog blog)</span> &#123;</span><br><span class="line">        <span class="comment">// 获取登录用户</span></span><br><span class="line">        <span class="type">UserDTO</span> <span class="variable">user</span> <span class="operator">=</span> UserHolder.getUser();</span><br><span class="line">        blog.setUserId(user.getId());</span><br><span class="line">        <span class="comment">// 保存探店博文</span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">success</span> <span class="operator">=</span> save(blog);</span><br><span class="line">        <span class="keyword">if</span> (!success) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">MySqlException</span>(MessageConstant.BLOG_FAILED);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 推送给粉丝</span></span><br><span class="line">        <span class="comment">// 获取粉丝</span></span><br><span class="line">        List&lt;Follow&gt; follows = followService.lambdaQuery().eq(Follow::getFollowUserId, user.getId()).list();</span><br><span class="line">        <span class="comment">// 推送</span></span><br><span class="line">        follows.forEach(follow -&gt; &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.FEED_KEY + follow.getUserId();</span><br><span class="line">            redisTemplate.opsForZSet().add(key, blog.getId().toString(), System.currentTimeMillis());</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">// 返回id</span></span><br><span class="line">        <span class="keyword">return</span> blog.getId();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Feed流的分页实现"><a href="#Feed流的分页实现" class="headerlink" title="Feed流的分页实现"></a>Feed流的分页实现</h3><p>Feed流中的数据会不断更新，所以数据的角标也在变化，因此不能采用传统的分页模式。所以我们在这里采用<strong>滚动分页</strong>来实现分页查询。<br><img src="https://s3.bmp.ovh/imgs/2024/05/25/50fd938000530894.png" alt="滚动分页实现"><br>滚动分页查询需要的Redis命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZREVRANGEBYSCORE key max min WITHSCORES LIMIT offset count</span><br></pre></td></tr></table></figure>
+<p>参数含义：</p>
+<ul>
+<li><code>key</code>：ZSET的键名</li>
+<li><code>max</code>：第一页为当前时间戳，后面的查询为上次查询的最小时间戳</li>
+<li><code>min</code>：0</li>
+<li><code>offset</code>：第一页为0，后面是上次查询时与最小值一样的元素个数</li>
+<li><code>count</code>：每一页的数据条数</li>
+</ul>
+<p>基于这条指令，实现业务代码。<br>先创建一个返回数据的<code>DTO</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ScrollResult</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;?&gt; list;</span><br><span class="line">    <span class="keyword">private</span> Long minTime;</span><br><span class="line">    <span class="keyword">private</span> Integer offset;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后按照以下步骤实现业务逻辑：</p>
+<ol>
+<li>获取当前用户</li>
+<li>查询收件箱</li>
+<li>解析数据：<code>blogId</code>,<code>minTime</code>,<code>offset</code></li>
+<li>根据<code>blogId</code>查询博客</li>
+<li>封装并返回</li>
+</ol>
+<p>代码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> ScrollResult <span class="title function_">queryBlogOfFollow</span><span class="params">(Long max, Integer offset)</span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前用户</span></span><br><span class="line">    <span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> UserHolder.getUser().getId();</span><br><span class="line">    <span class="comment">// 查询收件箱</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.FEED_KEY + userId;</span><br><span class="line">    Set&lt;ZSetOperations.TypedTuple&lt;String&gt;&gt; typedTuples =</span><br><span class="line">            redisTemplate.opsForZSet().reverseRangeByScoreWithScores(</span><br><span class="line">                    key, <span class="number">0</span>, max, offset, RedisConstants.BLOG_COUNT);</span><br><span class="line">    <span class="comment">// 解析数据</span></span><br><span class="line">    <span class="keyword">if</span> (typedTuples == <span class="literal">null</span> || typedTuples.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">long</span> <span class="variable">minTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">    <span class="type">int</span> <span class="variable">nextOffset</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    List&lt;Long&gt; ids = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(typedTuples.size());</span><br><span class="line">    <span class="keyword">for</span> (ZSetOperations.TypedTuple&lt;String&gt; tuple : typedTuples)&#123;</span><br><span class="line">        ids.add(Long.valueOf(tuple.getValue()));</span><br><span class="line">        <span class="type">long</span> <span class="variable">time</span> <span class="operator">=</span> tuple.getScore().longValue();</span><br><span class="line">        <span class="keyword">if</span> (minTime == time) &#123;</span><br><span class="line">            nextOffset++;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            minTime = time;</span><br><span class="line">            nextOffset = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 根据id查询blog</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">idStr</span> <span class="operator">=</span> StrUtil.join(<span class="string">&quot;,&quot;</span>, ids);</span><br><span class="line">    List&lt;Blog&gt; blogs = lambdaQuery()</span><br><span class="line">            .in(Blog::getId, ids)</span><br><span class="line">            .last(<span class="string">&quot;order by field(id, &quot;</span> + idStr + <span class="string">&quot;)&quot;</span>)</span><br><span class="line">            .list();</span><br><span class="line">    blogs.forEach(blog -&gt; &#123;</span><br><span class="line">        setIsLiked(blog);</span><br><span class="line">        queryBlogUser(blog);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 封装并返回</span></span><br><span class="line">    <span class="type">ScrollResult</span> <span class="variable">scrollResult</span> <span class="operator">=</span> ScrollResult.builder()</span><br><span class="line">            .minTime(minTime)</span><br><span class="line">            .offset(nextOffset)</span><br><span class="line">            .list(blogs)</span><br><span class="line">            .build();</span><br><span class="line">    <span class="keyword">return</span> scrollResult;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上，就是Feed流的推模式实现。以后可能会改进为推拉结合。</p>
+
+        
+      </div>
+
+         
+    </div>
+    
+     
+  </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left  disabled "
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2024/05/24/%E4%BD%BF%E7%94%A8ZSET%E5%AE%9E%E7%8E%B0topN%E7%82%B9%E8%B5%9E%E6%8E%92%E8%A1%8C/"
+      title="使用ZSET实现topN点赞排行"
+     >
+
+    <p class="title-text">
+      
+        使用ZSET实现topN点赞排行
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+
+
+
+    </div>
+    <div id="footer-wrapper">
+      <footer id="footer">
+  
+  <div id="footer-info" class="inner">
+    
+    &copy; 2024 StreLitziaYc<br>
+    Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
+  </div>
+</footer>
+
+    </div>
+    <div class="back-to-top-wrapper">
+    <button id="back-to-top-btn" class="back-to-top-btn hide" onclick="topFunction()">
+        <i class="fa-solid fa-angle-up"></i>
+    </button>
+</div>
+
+<script>
+    function topFunction() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    let btn = document.getElementById('back-to-top-btn');
+    function scrollFunction() {
+        if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+            btn.classList.remove('hide')
+        } else {
+            btn.classList.add('hide')
+        }
+    }
+    window.onscroll = function() {
+        scrollFunction();
+    }
+</script>
+
+  </div>
+  <script src="/js/light-dark-switch.js"></script>
+</body>
+</html>
