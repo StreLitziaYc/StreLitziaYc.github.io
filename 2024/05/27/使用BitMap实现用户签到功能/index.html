@@ -28,8 +28,10 @@
 <meta property="og:description" content="什么是BitMap 所谓 BitMap 就是用一个 bit 位来标记某个元素对应的 value，而 key 即是这个元素。由于采用bit为单位来存储数据，因此在可以大大的节省存储空间。  优点：  效率高，不许进行比较和移位 占用内存少，比如N&#x3D;10000000;只需占用内存为N&#x2F;8 &#x3D; 1250000Bytes &#x3D; 1.2M，如果采用int数组存储，则需要">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-27T05:55:31.000Z">
-<meta property="article:modified_time" content="2024-05-27T09:08:30.156Z">
+<meta property="article:modified_time" content="2024-07-07T11:23:15.125Z">
 <meta property="article:author" content="StreLitziaYc">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="BitMap">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="槲寄生" type="application/atom+xml">
@@ -162,12 +164,12 @@
         
             <a class="category-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
                 Java学习笔记
-                <div class="category-count">10</div>
+                <div class="category-count">12</div>
             </a>
         <div class="children"><div class="category-box">
             <a class="category-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">
                 黑马点评
-                <div class="category-count">9</div>
+                <div class="category-count">11</div>
             </a>
         </div></div>
             <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
@@ -189,7 +191,7 @@
   <div class="widget-wrap">
     <div class="widget">
       <h3 class="widget-title">标签</h3>
-      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Feed%E6%B5%81/" rel="tag">Feed流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/GEO/" rel="tag">GEO</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/HyperLogLog/" rel="tag">HyperLogLog</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/JUC/" rel="tag">JUC</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Reids/" rel="tag">Reids</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Session/" rel="tag">Session</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Spring/" rel="tag">Spring</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/UV%E7%BB%9F%E8%AE%A1/" rel="tag">UV统计</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E4%BA%8C%E5%88%86%E6%B3%95/" rel="tag">二分法</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag">分布式锁</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="tag">工具类</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%89%8B%E6%92%95%E7%AE%97%E6%B3%95/" rel="tag">手撕算法</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag">消息队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/" rel="tag">碎碎念</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%BC%93%E5%AD%98/" rel="tag">缓存</a></li></ul>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/BitMap/" rel="tag">BitMap</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Feed%E6%B5%81/" rel="tag">Feed流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/GEO/" rel="tag">GEO</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/HyperLogLog/" rel="tag">HyperLogLog</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/JUC/" rel="tag">JUC</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Reids/" rel="tag">Reids</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Session/" rel="tag">Session</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Spring/" rel="tag">Spring</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/UV%E7%BB%9F%E8%AE%A1/" rel="tag">UV统计</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E4%BA%8C%E5%88%86%E6%B3%95/" rel="tag">二分法</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag">分布式锁</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="tag">工具类</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%89%8B%E6%92%95%E7%AE%97%E6%B3%95/" rel="tag">手撕算法</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag">消息队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/" rel="tag">碎碎念</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%BC%93%E5%AD%98/" rel="tag">缓存</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/" rel="tag">项目总结</a></li></ul>
     </div>
   </div>
 
@@ -200,6 +202,11 @@
     <div class="widget">
       <h3 class="widget-title">归档</h3>
       
+      
+        <a class="archive-link" href="/archives/2024/06 ">
+          六月 2024 
+          <div class="archive-count">1 </div>
+        </a>
       
         <a class="archive-link" href="/archives/2024/05 ">
           五月 2024 
@@ -222,6 +229,12 @@
       <h3 class="widget-title">最新文章</h3>
       <ul>
         
+          <a class="recent-link" href="/2024/06/01/%E5%AE%8C%E7%BB%93%E7%AF%87%EF%BC%81%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/" title="完结篇！黑马点评项目总结" >
+            <div class="recent-link-text">
+              完结篇！黑马点评项目总结
+            </div>
+          </a>
+        
           <a class="recent-link" href="/2024/05/27/HyperLogLog%E5%AE%9E%E7%8E%B0UV%E7%BB%9F%E8%AE%A1/" title="HyperLogLog实现UV统计" >
             <div class="recent-link-text">
               HyperLogLog实现UV统计
@@ -243,12 +256,6 @@
           <a class="recent-link" href="/2024/05/24/Feed%E6%B5%81%E5%AE%9E%E7%8E%B0%E4%BF%A1%E6%81%AF%E6%8E%A8%E9%80%81/" title="Feed流实现信息推送" >
             <div class="recent-link-text">
               Feed流实现信息推送
-            </div>
-          </a>
-        
-          <a class="recent-link" href="/2024/05/24/%E4%BD%BF%E7%94%A8ZSET%E5%AE%9E%E7%8E%B0topN%E7%82%B9%E8%B5%9E%E6%8E%92%E8%A1%8C/" title="使用ZSET实现topN点赞排行" >
-            <div class="recent-link-text">
-              使用ZSET实现topN点赞排行
             </div>
           </a>
         
@@ -290,7 +297,7 @@
           <div class="need-seperator meta-info">
             <div class="meta-cate-flex">
   
-    未分类 
+  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
    
 </div>
   
@@ -300,6 +307,8 @@
           </div>
         </div>
         
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BitMap/" rel="tag">BitMap</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li></ul>
+
       </header>
       <div class="e-content article-entry" itemprop="articleBody">
         
