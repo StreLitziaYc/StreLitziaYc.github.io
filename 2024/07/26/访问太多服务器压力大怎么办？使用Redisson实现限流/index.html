@@ -14,19 +14,28 @@
   
 
   
-  <title>标签: Redis | 槲寄生</title>
+  <title>访问太多服务器压力大怎么办？使用Redisson实现限流 | 槲寄生</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="槲寄生">
-<meta property="og:url" content="https://strelitziayc.github.io/tags/Redis/index.html">
+  <meta name="description" content="限流，也称流量控制。是指系统在面临高并发，或者大流量请求的情况下，限制新的请求对系统的访问，从而保证系统的稳定性。限流会导致部分用户请求处理不及时或者被拒，这就影响了用户体验。所以一般需要在系统稳定和用户体验之间平衡一下。  常见的限流算法有四种，分别是：  固定窗口限流算法 滑动窗口限流算法 漏桶算法 令牌桶算法  这里就不挨个展开讲了，感兴趣可以看看这篇文章 使用Redisson实现令牌桶算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="访问太多服务器压力大怎么办？使用Redisson实现限流">
+<meta property="og:url" content="https://strelitziayc.github.io/2024/07/26/%E8%AE%BF%E9%97%AE%E5%A4%AA%E5%A4%9A%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8E%8B%E5%8A%9B%E5%A4%A7%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F%E4%BD%BF%E7%94%A8Redisson%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81/index.html">
 <meta property="og:site_name" content="槲寄生">
+<meta property="og:description" content="限流，也称流量控制。是指系统在面临高并发，或者大流量请求的情况下，限制新的请求对系统的访问，从而保证系统的稳定性。限流会导致部分用户请求处理不及时或者被拒，这就影响了用户体验。所以一般需要在系统稳定和用户体验之间平衡一下。  常见的限流算法有四种，分别是：  固定窗口限流算法 滑动窗口限流算法 漏桶算法 令牌桶算法  这里就不挨个展开讲了，感兴趣可以看看这篇文章 使用Redisson实现令牌桶算">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/07/26/1be0a52bdeaa7648.png">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2024/07/26/f5c78b114e45c3fd.png">
+<meta property="article:published_time" content="2024-07-26T09:08:12.000Z">
+<meta property="article:modified_time" content="2024-07-26T09:24:26.597Z">
 <meta property="article:author" content="StreLitziaYc">
+<meta property="article:tag" content="Redisson">
+<meta property="article:tag" content="限流">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.bmp.ovh/imgs/2024/07/26/1be0a52bdeaa7648.png">
   
     <link rel="alternate" href="/atom.xml" title="槲寄生" type="application/atom+xml">
   
@@ -274,215 +283,108 @@
     <div id="content-body">
        
 
-<div class="archive-main-card">
-    <div class="archive-top">
-      <div class="main-title-bar">
-        <div class="main-title-dot"></div>
-        <h1 class="article-title">归档</h1>
-      </div>    
+
+<article id="post-访问太多服务器压力大怎么办？使用Redisson实现限流" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        访问太多服务器压力大怎么办？使用Redisson实现限流
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-07-26T09:08:12.000Z" itemprop="datePublished">2024-07-26</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%99%BA%E8%83%BDBI/">智能BI</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            898 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redisson/" rel="tag">Redisson</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <blockquote>
+<p>限流，也称流量控制。是指系统在面临高并发，或者<strong>大流量请求</strong>的情况下，<strong>限制新的请求对系统的访问</strong>，从而保证<strong>系统的稳定性</strong>。限流会导致部分用户请求处理不及时或者被拒，这就影响了用户体验。所以一般需要在系统稳定和用户体验之间<strong>平衡</strong>一下。</p>
+</blockquote>
+<p>常见的限流算法有四种，分别是：</p>
+<ul>
+<li>固定窗口限流算法</li>
+<li>滑动窗口限流算法</li>
+<li>漏桶算法</li>
+<li>令牌桶算法</li>
+</ul>
+<p>这里就不挨个展开讲了，感兴趣可以看看<a target="_blank" rel="noopener" href="https://juejin.cn/post/6967742960540581918">这篇文章</a></p>
+<h3 id="使用Redisson实现令牌桶算法来完成限流"><a href="#使用Redisson实现令牌桶算法来完成限流" class="headerlink" title="使用Redisson实现令牌桶算法来完成限流"></a>使用Redisson实现令牌桶算法来完成限流</h3><p>直接上代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RedissonLimiterManager</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> RedissonClient redissonClient;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 限流操作</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key 区分不同的限流器，比如用户id</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doRateLimit</span><span class="params">(String key)</span> &#123;</span><br><span class="line">        <span class="type">RRateLimiter</span> <span class="variable">rateLimiter</span> <span class="operator">=</span> redissonClient.getRateLimiter(key);</span><br><span class="line">        <span class="comment">// 每个时间单位允许5次请求，每个时间单位有1s</span></span><br><span class="line">        rateLimiter.trySetRate(RateType.OVERALL, <span class="number">5</span>, <span class="number">1</span>, RateIntervalUnit.SECONDS);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 每当一个请求来了后，获取1个令牌</span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">canOp</span> <span class="operator">=</span> rateLimiter.tryAcquire(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (!canOp) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(ErrorCode.TOO_MANY_REQUEST);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h3><p>测试代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">doRateLimit</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;1&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        redissonLimiterManager.doRateLimit(key);</span><br><span class="line">        System.out.println(<span class="string">&quot;Success&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每秒5次请求，没有被限流<br><img src="https://s3.bmp.ovh/imgs/2024/07/26/1be0a52bdeaa7648.png"></p>
+<p>改成6次<br><img src="https://s3.bmp.ovh/imgs/2024/07/26/f5c78b114e45c3fd.png"><br>可以看到，抛出了异常，限流的目的实现了</p>
+
+        
+      </div>
+
+         
     </div>
     
-    
-      
-      
-        
-        <div class="year-line">
-            <div class="year-num">2024</div>
-            <div class="dot-wrapper">
-                <div class="dot"></div>
-            </div>
-            <div class="article-count">10 篇文章</div>
-        </div>
-      
-      <a class="archive-article-link" href="/2024/06/01/%E5%AE%8C%E7%BB%93%E7%AF%87%EF%BC%81%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/" title="完结篇！黑马点评项目总结">
-        <div class="date">06-01</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    完结篇！黑马点评项目总结
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #项目总结
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/05/27/HyperLogLog%E5%AE%9E%E7%8E%B0UV%E7%BB%9F%E8%AE%A1/" title="HyperLogLog实现UV统计">
-        <div class="date">05-27</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    HyperLogLog实现UV统计
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #UV统计 #HyperLogLog
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/05/27/%E4%BD%BF%E7%94%A8BitMap%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7%E7%AD%BE%E5%88%B0%E5%8A%9F%E8%83%BD/" title="使用BitMap实现用户签到功能">
-        <div class="date">05-27</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    使用BitMap实现用户签到功能
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #BitMap
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/05/26/%E4%BD%BF%E7%94%A8GEO%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9E%E7%8E%B0%E9%99%84%E8%BF%91%E5%95%86%E9%93%BA%E5%8A%9F%E8%83%BD/" title="使用GEO数据结构实现附近商铺功能">
-        <div class="date">05-26</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    使用GEO数据结构实现附近商铺功能
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #GEO
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/05/24/%E4%BD%BF%E7%94%A8ZSET%E5%AE%9E%E7%8E%B0topN%E7%82%B9%E8%B5%9E%E6%8E%92%E8%A1%8C/" title="使用ZSET实现topN点赞排行">
-        <div class="date">05-24</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    使用ZSET实现topN点赞排行
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/05/23/%E4%BD%BF%E7%94%A8Redis%E4%BC%98%E5%8C%96%E7%94%A8%E6%88%B7%E7%82%B9%E8%B5%9E%E5%8A%9F%E8%83%BD/" title="使用Redis优化用户点赞功能">
-        <div class="date">05-23</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    使用Redis优化用户点赞功能
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/05/18/%E4%BD%BF%E7%94%A8Redis%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%B7%B1%E7%9A%84%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" title="使用Redis实现自己的消息队列">
-        <div class="date">05-18</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    使用Redis实现自己的消息队列
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #消息队列
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/04/30/Redis%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" title="Redis实现分布式锁">
-        <div class="date">04-30</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    Redis实现分布式锁
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #分布式锁 #JUC
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/04/25/%E5%85%B3%E4%BA%8E%E7%BC%93%E5%AD%98%E4%BC%9A%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E5%8F%8A%E5%85%B6Java%E5%AE%9E%E7%8E%B0/" title="关于缓存会出现的一些问题及其Java实现">
-        <div class="date">04-25</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    关于缓存会出现的一些问题及其Java实现
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #缓存
-        </div>
-      </a>
-    
-      
-      
-      <a class="archive-article-link" href="/2024/04/22/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E7%9A%84%E7%99%BB%E5%87%BA%E6%93%8D%E4%BD%9C/" title="黑马点评项目的登出操作">
-        <div class="date">04-22</div>
-        <div class="line">
-            <div class="dot"></div>
-        </div>
-        <div class="title">
-            <div class="title-inner">
-                
-                    黑马点评项目的登出操作
-                
-            </div>
-        </div>
-        <div class="tags">
-            #Redis #Session
-        </div>
-      </a>
-    
+     
   </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left  disabled "
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2024/06/01/%E5%AE%8C%E7%BB%93%E7%AF%87%EF%BC%81%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/"
+      title="完结篇！黑马点评项目总结"
+     >
+
+    <p class="title-text">
+      
+        完结篇！黑马点评项目总结
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+
+
+
     </div>
     <div id="footer-wrapper">
       <footer id="footer">
