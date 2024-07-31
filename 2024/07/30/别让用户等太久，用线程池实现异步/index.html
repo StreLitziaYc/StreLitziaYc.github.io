@@ -14,17 +14,21 @@
   
 
   
-  <title>槲寄生</title>
+  <title>别让用户等太久，用线程池实现异步 | 槲寄生</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="槲寄生">
-<meta property="og:url" content="https://strelitziayc.github.io/page/2/index.html">
+  <meta name="description" content="如果采用同步的方法，用户会等很久才能等到系统的响应，这样的体验显然不好于是，我们引入异步，即用户只需要提交任务就好，系统会另开一个新线程去处理这个任务  那么，怎么优雅的实现开新线程这个过程呢？我们会遇到以下问题：  任务队列的最大容量是多少呢？ 怎么控制队列长度不超过最大容量呢？ 程序如何葱任务队列中取出任务来执行呢？ 任务队列的流程如何实现呢？ 怎么保证程序最多同时执行多少个任务呢？ 。。。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="别让用户等太久，用线程池实现异步">
+<meta property="og:url" content="https://strelitziayc.github.io/2024/07/30/%E5%88%AB%E8%AE%A9%E7%94%A8%E6%88%B7%E7%AD%89%E5%A4%AA%E4%B9%85%EF%BC%8C%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5/index.html">
 <meta property="og:site_name" content="槲寄生">
+<meta property="og:description" content="如果采用同步的方法，用户会等很久才能等到系统的响应，这样的体验显然不好于是，我们引入异步，即用户只需要提交任务就好，系统会另开一个新线程去处理这个任务  那么，怎么优雅的实现开新线程这个过程呢？我们会遇到以下问题：  任务队列的最大容量是多少呢？ 怎么控制队列长度不超过最大容量呢？ 程序如何葱任务队列中取出任务来执行呢？ 任务队列的流程如何实现呢？ 怎么保证程序最多同时执行多少个任务呢？ 。。。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-07-30T14:33:07.000Z">
+<meta property="article:modified_time" content="2024-07-31T06:03:14.454Z">
 <meta property="article:author" content="StreLitziaYc">
 <meta name="twitter:card" content="summary">
   
@@ -49,14 +53,14 @@
   
   
     
-<div id="banner" class=" is_home ">
+<div id="banner" class="">
   <img src="https://s3.bmp.ovh/imgs/2024/04/26/2dc786326e755978.jpg" itemprop="image">
   <div id="banner-dim"></div>
 </div>
  
    
   <div id="main-grid" class="  ">
-    <div id="nav" class=" is_home "  >
+    <div id="nav" class=""  >
       <navbar id="navbar">
   <nav id="title-nav">
     <a href="/">
@@ -272,11 +276,12 @@
 </sidebar>
     </div>
     <div id="content-body">
-      
-   
+       
 
 
-<article id="post-二分法的各种灵魂拷问" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+<article id="post-别让用户等太久，用线程池实现异步" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
    
   <div class="article-inner">
     <div class="article-main">
@@ -286,8 +291,8 @@
   <div class="main-title-dot"></div>
   
     
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2024/05/10/%E4%BA%8C%E5%88%86%E6%B3%95%E7%9A%84%E5%90%84%E7%A7%8D%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE/">二分法的各种灵魂拷问</a>
+      <h1 class="p-name article-title" itemprop="headline name">
+        别让用户等太久，用线程池实现异步
       </h1>
     
   
@@ -295,41 +300,88 @@
 
         <div class='meta-info-bar'>
           <div class="meta-info">
-  <time class="dt-published" datetime="2024-05-10T10:01:19.000Z" itemprop="datePublished">2024-05-10</time>
+  <time class="dt-published" datetime="2024-07-30T14:33:07.000Z" itemprop="datePublished">2024-07-30</time>
 </div>
           <div class="need-seperator meta-info">
             <div class="meta-cate-flex">
   
-  <a class="meta-cate-link" href="/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">算法学习笔记</a>><a class="meta-cate-link" href="/categories/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%95%B0%E7%BB%84/">数组</a>
+    未分类 
    
 </div>
   
           </div>
           <div class="wordcount need-seperator meta-info">
-            715 词 
+            2.1k 词 
           </div>
         </div>
         
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%BA%8C%E5%88%86%E6%B3%95/" rel="tag">二分法</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%89%8B%E6%92%95%E7%AE%97%E6%B3%95/" rel="tag">手撕算法</a></li></ul>
-
       </header>
       <div class="e-content article-entry" itemprop="articleBody">
         
-          <div class="truncate-text">
-            
-              
-二分法，很简单啊，很早就知道这个了，不就是一直从中间取值，然后找到target吗
+          <blockquote>
+<p>如果采用同步的方法，用户会等很久才能等到系统的响应，这样的体验显然不好<br>于是，我们引入异步，即用户只需要提交任务就好，系统会另开一个新线程去处理这个任务</p>
+</blockquote>
+<p>那么，怎么优雅的实现开新线程这个过程呢？我们会遇到以下问题：</p>
+<ul>
+<li>任务队列的最大容量是多少呢？</li>
+<li>怎么控制队列长度不超过最大容量呢？</li>
+<li>程序如何葱任务队列中取出任务来执行呢？</li>
+<li>任务队列的流程如何实现呢？</li>
+<li>怎么保证程序最多同时执行多少个任务呢？</li>
+<li>。。。。。。？</li>
+</ul>
+<p>所以，我们要使用<strong>线程池</strong></p>
+<blockquote>
+<p><strong>线程池（Thread Pool）</strong> 是一种并发编程中常用的技术，用于管理和重用线程。它由线程池管理器、工作队列和线程池线程组成。<br>线程池的基本概念是，在应用程序启动时创建一定数量的线程，并将它们保存在线程池中。当需要执行任务时，从线程池中获取一个空闲的线程，将任务分配给该线程执行。当任务执行完毕后，线程将返回到线程池，可以被其他任务复用。</p>
+</blockquote>
+<h2 id="为什么需要线程池？"><a href="#为什么需要线程池？" class="headerlink" title="为什么需要线程池？"></a>为什么需要线程池？</h2><ul>
+<li>线程的管理复杂 （何时新增线程？何时减少空闲线程？）</li>
+<li>任务存取复杂 （何时接受任务？何时拒绝任务？怎么保证大家不会抢到同一个任务？）</li>
+</ul>
+<h2 id="线程池的优势"><a href="#线程池的优势" class="headerlink" title="线程池的优势"></a>线程池的优势</h2><ul>
+<li><strong>降低资源消耗</strong>：通过重复利用已创建的线程降低线程创建和销毁造成的消耗</li>
+<li><strong>提高响应速度</strong>：当任务到达时，任务可以不需要等到线程创建就能立即执行</li>
+<li><strong>提高线程的可管理性</strong>：线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
+<li><strong>实现消峰</strong>：当请求突然大量增多时，系统也能平稳运行（这并不是线程池的独占优势，阻塞队列、消息队列等亦能实现消峰）</li>
+</ul>
+<h2 id="线程池的创建与参数"><a href="#线程池的创建与参数" class="headerlink" title="线程池的创建与参数"></a>线程池的创建与参数</h2><p>大多数程序都有一个基本的默认线程池，但是当程序复杂后多种任务都混合在同一线程池种，且不够灵活。所以我们一般会手动去创建线程池。<br><strong>怎么更好的理解线程池呢？</strong><br>我们可以把线程池想象成一个公司，提交到线程池的任务即是<strong>工作</strong>，线程便是公司中的<strong>员工</strong>。<br>那么，我们在这个理解下，来看线程池的参数如何理解<br>线程池创建时的构造函数参数如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">ThreadPoolExecutor</span><span class="params">(<span class="type">int</span> corePoolSize,</span></span><br><span class="line"><span class="params">                          <span class="type">int</span> maximumPoolSize,</span></span><br><span class="line"><span class="params">                          <span class="type">long</span> keepAliveTime,</span></span><br><span class="line"><span class="params">                          TimeUnit unit,</span></span><br><span class="line"><span class="params">                          BlockingQueue&lt;Runnable&gt; workQueue,</span></span><br><span class="line"><span class="params">                          ThreadFactory threadFactory,</span></span><br><span class="line"><span class="params">                          RejectedExecutionHandler handler)</span></span><br></pre></td></tr></table></figure>
+<p>其中每个参数的意思可以参考源码：</p>
+<ul>
+<li><code>corePoolSize</code>：核心线程数，即会长期存在的线程数，也就是<strong>不会被开除的正式员工</strong></li>
+<li><code>maximumPoolSize</code>：最大线程数，当任务较多时，通过创建新的临时线程所能达到的最大线程数，也就是<strong>公司缺人时紧急招来的临时员工</strong></li>
+<li><code>keepAliveTime</code>, <code>unit</code>：二者共同组成临时线程的存活时间，当临时线程空闲超过这个时间后，会被销毁，也就是<strong>临时员工多久不干活就会被开除</strong></li>
+<li><code>workQueue</code>：存放任务的一个阻塞队列，也就是<strong>工作备忘录</strong></li>
+<li><code>threadFactory</code>：线程工程，可以定制线程属性（名称、优先级等），跟踪和监控线程</li>
+<li><code>handler</code>：拒绝策略，默认当队列满时拒绝任务（也可以设置为重新排队等策略）</li>
+</ul>
+<h2 id="线程池的工作方式"><a href="#线程池的工作方式" class="headerlink" title="线程池的工作方式"></a>线程池的工作方式</h2><p>想要知道各个参数该怎么设置，就得先知道线程池的工作方式，接下来我们将分几种情况来讨论：</p>
+<ul>
+<li><p>刚开始，没有任何线程和任务<br>  接到新的任务（工作）后，线程池会创建一个新线程（招聘一个正式员工）来完成这个任务</p>
+</li>
+<li><p>线程数已达到 <code>corePoolSize</code>，即正式员工已经招满了<br>  新来的任务会被放进 <code>workQueue</code> 中，也就是在备忘录中记下这个任务</p>
+</li>
+<li><p><code>workQueue</code> 满了，即备忘录已经写满，不能再写了<br>  线程池会创建临时线程，也就是招聘临时工</p>
+</li>
+<li><p>线程数达到 <code>maximumPoolSize</code>，即员工总数也满了<br>  此时临时线程也不会再被创建，多的任务会按照拒绝策略 <code>handler</code> 处理，默认是直接拒绝</p>
+</li>
+<li><p>临时线程的空闲时间达到 <code>keepAliveTime</code> 后，线程会被消耗<br>  此时临时线程会被销毁，直到线程数达到 <code>corePoolSize</code></p>
+</li>
+</ul>
+<h2 id="设置合理的线程池参数"><a href="#设置合理的线程池参数" class="headerlink" title="设置合理的线程池参数"></a>设置合理的线程池参数</h2><p>设计线程池参数时，需要考虑任务是 IO 密集型还是计算密集型</p>
+<ul>
+<li><p><strong>计算密集型</strong><br>  吃CPU，比如音视频处理、图像处理、数学计算等<br>  一般将 <code>corePoolSize</code> 设置为 CPU 核心数加一，“加一”可以理解为一个备用线程，来处理其他任务。这样做可以充分利用每一个 CPU 核心，减少线程间的频繁切换，降低开销。<br>  <code>maximumPoolSize</code> 的设定没有严格的规则，一般可以设置为核心线程数的两倍到三倍。</p>
+</li>
+<li><p><strong>IO 密集型</strong><br>  主要消耗带宽或内存硬盘的读写资源，对 CPU 的利用率不高，如查询数据库或等待网络消息传输<br>  这种情况下可以适当增大 <code>corePoolSize</code> 的值，因为 CPU 本来就是空闲的</p>
+</li>
+</ul>
+<h2 id="提交任务"><a href="#提交任务" class="headerlink" title="提交任务"></a>提交任务</h2><p>因为有了线程池的封装，所以提交任务就很简单了，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CompletableFuture <span class="title function_">runAsync</span><span class="params">(Runnable runnable, Executor executor)</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>runnable</code> 是要执行的任务</li>
+<li><code>executor</code> 是之前创建好的线程池，若不传入这个参数，则是使用系统默认的线程池</li>
+</ul>
 
-那么， 每次写二分法时，有没有想过，while判断条件里的left和right，究竟是&lt;还是&lt;=呢；更新边界时，right究竟是middle还是middle - 1呢？
-至少对我来说，每次写二分这些都是随缘的，能a就行，但是大部分时候a不了 
-回到正题，写二分法时，最重要的就是保持区间不变
-所谓区间不变，就是整个算法当中，都要明确自己的代码是左闭右闭[left, right]，还是左闭右开[left, right)，以下只会讲左闭右闭的情况，另外的情况就很简单了。
-&lt; 还是 &lt;=while里的判断条件，也就是区间是否合法的条件，我们假设left和right相等，区间就是[1,1]，这个区间显然合法，所以应该是&lt;=
-也不难想到，在左闭右开的情况下，是不能取等号的，因为[1, 1)显然不合法
-要不要减一（加一）边界更新的前提是我们已经知道了nums[middle] != target， 此时我们的下一个搜索范围，肯定不应该包含middle了，所以应该是要加一或减一的。
-...
-            
-          </div>
         
       </div>
 
@@ -337,434 +389,38 @@
     </div>
     
      
-    <a class="right-panel  non-pic  "
-      
-      href="/2024/05/10/%E4%BA%8C%E5%88%86%E6%B3%95%E7%9A%84%E5%90%84%E7%A7%8D%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
   </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left  disabled "
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2024/07/26/%E8%AE%BF%E9%97%AE%E5%A4%AA%E5%A4%9A%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8E%8B%E5%8A%9B%E5%A4%A7%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F%E4%BD%BF%E7%94%A8Redisson%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81/"
+      title="访问太多服务器压力大怎么办？使用Redisson实现限流"
+     >
+
+    <p class="title-text">
+      
+        访问太多服务器压力大怎么办？使用Redisson实现限流
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
   
 </article>
 
 
 
-
-
-
-   
-
-
-<article id="post-在非Spring管理的类中注入Bean" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2024/05/08/%E5%9C%A8%E9%9D%9ESpring%E7%AE%A1%E7%90%86%E7%9A%84%E7%B1%BB%E4%B8%AD%E6%B3%A8%E5%85%A5Bean/">在非Spring管理的类中注入Bean</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2024-05-08T13:23:36.000Z" itemprop="datePublished">2024-05-08</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-            1.2k 词 
-          </div>
-        </div>
-        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/" rel="tag">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7%E7%B1%BB/" rel="tag">工具类</a></li></ul>
-
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            
-              
-在Spring管理的类中注入Bean对象非常容易，只需使用@Autowired或者@Resource注解即可，但是在非Spring管理的对象中，注入Bean对象却没这么简单。
-
-这时，我们就需要自己写一个工具类了，实现很简单，代码如下：
-123456789101112131415161718192021222324252627282930313233343536373839404142434445464748package com.hmdp.utils;import org.springframework.beans.BeansException;import org.springframework.context.ApplicationContext;import org.springframework.context.ApplicationContextAware;import org.springframework.lang.NonNull;import org.springframework.stereotype.Component;@Componentpublic c...
-            
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2024/05/08/%E5%9C%A8%E9%9D%9ESpring%E7%AE%A1%E7%90%86%E7%9A%84%E7%B1%BB%E4%B8%AD%E6%B3%A8%E5%85%A5Bean/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
-
-
-
-
-
-   
-
-
-<article id="post-Redis实现分布式锁" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2024/04/30/Redis%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">Redis实现分布式锁</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2024-04-30T07:15:36.000Z" itemprop="datePublished">2024-04-30</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-            5.4k 词 
-          </div>
-        </div>
-        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC/" rel="tag">JUC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" rel="tag">分布式锁</a></li></ul>
-
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            
-              
-虽然Java提供了 synchronized之类的方法来实现线程对临界资源的互斥访问，但是这仅仅局限于单台服务器，对于集群服务器并不适用。
-
-Redis分布式锁
-于是我们希望通过Redis来实现服务器集群的线程锁，因为Redis对于所有服务器来说是相同的，且具有较好的性能和较高的可用性。
-简单实现具体实现流程如下：
-代码实现先写一个锁的抽象类，因为会做多个版本的实现
-123456789101112131415public abstract class ILock &#123;    /**     * 尝试获取锁     *     * @param timeoutSec 锁自动释放的市场（秒）     * @return 是否成功获取到锁     */    abstract public boolean tryLock(long timeoutSec);    /**     * 释放锁     */    abstract public void unlock();&#125;
-
-当前版本的最基础实现
-12345678910111213141516171819202122...
-            
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2024/04/30/Redis%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
-
-
-
-
-
-   
-
-
-<article id="post-关于缓存会出现的一些问题及其Java实现" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2024/04/25/%E5%85%B3%E4%BA%8E%E7%BC%93%E5%AD%98%E4%BC%9A%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E5%8F%8A%E5%85%B6Java%E5%AE%9E%E7%8E%B0/">关于缓存会出现的一些问题及其Java实现</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2024-04-25T13:58:40.000Z" itemprop="datePublished">2024-04-25</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-            5.8k 词 
-          </div>
-        </div>
-        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BC%93%E5%AD%98/" rel="tag">缓存</a></li></ul>
-
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            
-              缓存穿透
-缓存穿透：对于一个缓存和数据库中都不存在的数据查询，因为每次查询都会穿过缓存直接打在数据库上，所以很容易增大数据库压力，如下图所示。
-
-
-对于缓存穿透这个问题，解决方案包括但不限于如下：
-
-缓存空对象  进行一次结果为空的数据库查询后，以该查询为key，null为value，并设置TTL，将其放进缓存，这样在下一次同样的查询时，就不会再进行数据库查询。缺点
-缓存空对象会造成缓存的内存开销。
-
-代码实现  123456789101112131415161718192021222324252627282930313233343536373839404142/** * 普通缓存查询，使用存储空对象的方法防止缓存穿透 * * @param keyPrefix  key的前缀 * @param id         要查询的id * @param type       查询的实体类型 * @param dbFallBack 数据库查询方法 * @param time       新缓存的过期时间 * @param unit       时间单位 * @param &lt;T&gt...
-            
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2024/04/25/%E5%85%B3%E4%BA%8E%E7%BC%93%E5%AD%98%E4%BC%9A%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E5%8F%8A%E5%85%B6Java%E5%AE%9E%E7%8E%B0/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
-
-
-
-
-
-   
-
-
-<article id="post-黑马点评项目的登出操作" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2024/04/22/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E7%9A%84%E7%99%BB%E5%87%BA%E6%93%8D%E4%BD%9C/">黑马点评项目的登出操作</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2024-04-22T09:51:27.000Z" itemprop="datePublished">2024-04-22</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-            977 词 
-          </div>
-        </div>
-        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Session/" rel="tag">Session</a></li></ul>
-
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            
-              基于session完成登录时如何登出@Controller
-1234567@PostMapping(&quot;/logout&quot;)public Result logout(HttpSession session)&#123;    log.info(&quot;登出&quot;);    session.invalidate();  //使当前客户端的session无效化    userService.logout();      return Result.ok();&#125;
-@Service
-123public void logout(HttpHeaders headers) &#123;    UserHolder.removeUser();  //清空TreadLocal的数据&#125;
-
-基于Redis完成登录时登出@Controller
-123456@PostMapping(&quot;/logout&quot;)public Result logout(@RequestHeader HttpHeaders headers)&#123;    log....
-            
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2024/04/22/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84%E9%A1%B9%E7%9B%AE%E7%9A%84%E7%99%BB%E5%87%BA%E6%93%8D%E4%BD%9C/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
-
-
-
-
-
-   
-
-
-<article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2024/04/22/hello-world/">Hello World</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2024-04-22T08:10:01.000Z" itemprop="datePublished">2024-04-22</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-  <a class="meta-cate-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a>
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-            169 词 
-          </div>
-        </div>
-        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/" rel="tag">碎碎念</a></li></ul>
-
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            
-              捣鼓了一两个小时，磕磕绊绊的做好了这个博客
-Hello World程序的第一句话，永远是Hello World
-那么这个博客也算是我人生的Hello World吧
-结束了一些事情，也下定了一些决心，为人生开启一个新的阶段吧
-最近的一些小目标，应该就是写好简历，同时开始学八股吧
-加油加油
-希望这个博客我能一直坚持写下去吧
-只要努力，一定会有一个我想要的未来的
-
-            
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2024/04/22/hello-world/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  <nav id="page-nav">
-    <!-- 在第二页时 page.prev_link 不知为何无法返回正确的链接 -->
-    <a id="prev-btn" class="page-nav-btn " href=" /  ">
-      <i class="fa-solid fa-angle-left"></i>
-    </a>
-    <div id="num-bar">
-      <a class="page-number" href="/">1</a><span class="page-number current">2</span>  
-    </div>
-    <a id="next-btn" class="page-nav-btn disabled" href="/">
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-  </nav>
 
 
     </div>
