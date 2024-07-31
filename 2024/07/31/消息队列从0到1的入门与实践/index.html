@@ -14,24 +14,25 @@
   
 
   
-  <title>使用BitMap实现用户签到功能 | 槲寄生</title>
+  <title>消息队列从0到1的入门与实践 | 槲寄生</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
-  <meta name="description" content="什么是BitMap 所谓 BitMap 就是用一个 bit 位来标记某个元素对应的 value，而 key 即是这个元素。由于采用bit为单位来存储数据，因此在可以大大的节省存储空间。  优点：  效率高，不许进行比较和移位 占用内存少，比如N&#x3D;10000000;只需占用内存为N&#x2F;8 &#x3D; 1250000Bytes &#x3D; 1.2M，如果采用int数组存储，则需要">
+  <meta name="description" content="在上一篇文章中，我们用线程池实现了异步，但是这么做会有两个问题  阻塞队列在内存当中，如果服务器重启会导致任务丢失 只能在单体服务器上运行。若是分布式服务器，则需要进行同步工作，造成额外的开销和风险  所以，现在要采用分布式消息队列来实现异步 什么是消息队列？ MQ（全称Message Queue）是一种进程间通信或同一进程的不同线程间的通信方式，队列就是一个消息容器现实使用中，我们将消息队列称之">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用BitMap实现用户签到功能">
-<meta property="og:url" content="https://strelitziayc.github.io/2024/05/27/%E4%BD%BF%E7%94%A8BitMap%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7%E7%AD%BE%E5%88%B0%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:title" content="消息队列从0到1的入门与实践">
+<meta property="og:url" content="https://strelitziayc.github.io/2024/07/31/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%BB%8E0%E5%88%B01%E7%9A%84%E5%85%A5%E9%97%A8%E4%B8%8E%E5%AE%9E%E8%B7%B5/index.html">
 <meta property="og:site_name" content="槲寄生">
-<meta property="og:description" content="什么是BitMap 所谓 BitMap 就是用一个 bit 位来标记某个元素对应的 value，而 key 即是这个元素。由于采用bit为单位来存储数据，因此在可以大大的节省存储空间。  优点：  效率高，不许进行比较和移位 占用内存少，比如N&#x3D;10000000;只需占用内存为N&#x2F;8 &#x3D; 1250000Bytes &#x3D; 1.2M，如果采用int数组存储，则需要">
+<meta property="og:description" content="在上一篇文章中，我们用线程池实现了异步，但是这么做会有两个问题  阻塞队列在内存当中，如果服务器重启会导致任务丢失 只能在单体服务器上运行。若是分布式服务器，则需要进行同步工作，造成额外的开销和风险  所以，现在要采用分布式消息队列来实现异步 什么是消息队列？ MQ（全称Message Queue）是一种进程间通信或同一进程的不同线程间的通信方式，队列就是一个消息容器现实使用中，我们将消息队列称之">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-05-27T05:55:31.000Z">
-<meta property="article:modified_time" content="2024-07-07T11:23:15.125Z">
+<meta property="article:published_time" content="2024-07-31T06:14:42.000Z">
+<meta property="article:modified_time" content="2024-07-31T07:13:19.905Z">
 <meta property="article:author" content="StreLitziaYc">
-<meta property="article:tag" content="Redis">
-<meta property="article:tag" content="BitMap">
+<meta property="article:tag" content="消息队列">
+<meta property="article:tag" content="异步">
+<meta property="article:tag" content="RabbitMq">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="槲寄生" type="application/atom+xml">
@@ -281,7 +282,7 @@
        
 
 
-<article id="post-使用BitMap实现用户签到功能" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+<article id="post-消息队列从0到1的入门与实践" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   
     
    
@@ -294,7 +295,7 @@
   
     
       <h1 class="p-name article-title" itemprop="headline name">
-        使用BitMap实现用户签到功能
+        消息队列从0到1的入门与实践
       </h1>
     
   
@@ -302,67 +303,61 @@
 
         <div class='meta-info-bar'>
           <div class="meta-info">
-  <time class="dt-published" datetime="2024-05-27T05:55:31.000Z" itemprop="datePublished">2024-05-27</time>
+  <time class="dt-published" datetime="2024-07-31T06:14:42.000Z" itemprop="datePublished">2024-07-31</time>
 </div>
           <div class="need-seperator meta-info">
             <div class="meta-cate-flex">
   
-  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E9%BB%91%E9%A9%AC%E7%82%B9%E8%AF%84/">黑马点评</a>
+  <a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Java学习笔记</a>><a class="meta-cate-link" href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%99%BA%E8%83%BDBI/">智能BI</a>
    
 </div>
   
           </div>
           <div class="wordcount need-seperator meta-info">
-            2.4k 词 
+            2.8k 词 
           </div>
         </div>
         
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/BitMap/" rel="tag">BitMap</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RabbitMq/" rel="tag">RabbitMq</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%82%E6%AD%A5/" rel="tag">异步</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag">消息队列</a></li></ul>
 
       </header>
       <div class="e-content article-entry" itemprop="articleBody">
         
-          <h2 id="什么是BitMap"><a href="#什么是BitMap" class="headerlink" title="什么是BitMap"></a>什么是BitMap</h2><blockquote>
-<p>所谓 BitMap 就是用一个 bit 位来标记某个元素对应的 value，而 key 即是这个元素。由于采用bit为单位来存储数据，因此在可以大大的节省存储空间。</p>
+          <p>在<a href="https://strelitziayc.github.io/2024/07/30/%E5%88%AB%E8%AE%A9%E7%94%A8%E6%88%B7%E7%AD%89%E5%A4%AA%E4%B9%85%EF%BC%8C%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5/">上一篇文章</a>中，我们用线程池实现了异步，但是这么做会有两个问题</p>
+<ul>
+<li>阻塞队列在内存当中，如果服务器重启会导致任务丢失</li>
+<li>只能在单体服务器上运行。若是分布式服务器，则需要进行同步工作，造成额外的开销和风险</li>
+</ul>
+<p><strong>所以</strong>，现在要采用分布式消息队列来实现异步</p>
+<h2 id="什么是消息队列？"><a href="#什么是消息队列？" class="headerlink" title="什么是消息队列？"></a>什么是消息队列？</h2><blockquote>
+<p>MQ（全称Message Queue）是一种进程间通信或同一进程的不同线程间的通信方式，队列就是一个消息容器<br>现实使用中，我们将消息队列称之为中间件，从它的名字就可以看出，消息队列不存储消息内容的本身，它只是消息的搬运工</p>
 </blockquote>
-<p><strong>优点：</strong></p>
-<ul>
-<li>效率高，不许进行比较和移位</li>
-<li>占用内存少，比如N&#x3D;10000000;只需占用内存为N&#x2F;8 &#x3D; 1250000Bytes &#x3D; 1.2M，如果采用int数组存储，则需要38M多</li>
+<h2 id="消息队列的基本模型"><a href="#消息队列的基本模型" class="headerlink" title="消息队列的基本模型"></a>消息队列的基本模型</h2><ul>
+<li>消息 Message ：一个系统想要向另一个系统传递的数据</li>
+<li>生产者 Producer ：产生消息 Message 的系统</li>
+<li>消费者 Consumer ：处理生产者 Producer 产生的消息</li>
+<li>队列 Queue ：暂时用来存放消息</li>
 </ul>
-<p><strong>缺点：</strong></p>
-<ul>
-<li>无法对存在重复的数据进行排序和查找</li>
+<h2 id="分布式消息队列的优势是什么？"><a href="#分布式消息队列的优势是什么？" class="headerlink" title="分布式消息队列的优势是什么？"></a>分布式消息队列的优势是什么？</h2><h3 id="消息队列的优势"><a href="#消息队列的优势" class="headerlink" title="消息队列的优势"></a>消息队列的优势</h3><ul>
+<li><strong>异步处理</strong>，生产者只需要发送消息就可以了，无需关系消费者何时处理消息</li>
+<li><strong>削峰填谷</strong>，当消费者的处理能力有限时，而用户的请求量又很大。我们可以先把用户的请求存储在消息队列中，然后消费者或实际执行应用可以按照自身的处理能力逐步从队列中取出请求</li>
 </ul>
-<h2 id="为什么选择BitMap"><a href="#为什么选择BitMap" class="headerlink" title="为什么选择BitMap"></a>为什么选择BitMap</h2><p>假如我们用下面这样一张表来存储用户的签到信息</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `tb_sign`  (</span><br><span class="line">  `id` <span class="type">bigint</span>(<span class="number">20</span>) UNSIGNED <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;主键&#x27;</span>,</span><br><span class="line">  `user_id` <span class="type">bigint</span>(<span class="number">20</span>) UNSIGNED <span class="keyword">NOT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;用户id&#x27;</span>,</span><br><span class="line">  `<span class="keyword">year</span>` <span class="keyword">year</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;签到的年&#x27;</span>,</span><br><span class="line">  `<span class="keyword">month</span>` tinyint(<span class="number">2</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;签到的月&#x27;</span>,</span><br><span class="line">  `<span class="type">date</span>` <span class="type">date</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;签到的日期&#x27;</span>,</span><br><span class="line">  `is_backup` tinyint(<span class="number">1</span>) UNSIGNED <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span> COMMENT <span class="string">&#x27;是否补签&#x27;</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (`id`) <span class="keyword">USING</span> BTREE</span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB AUTO_INCREMENT <span class="operator">=</span> <span class="number">1</span> <span class="type">CHARACTER</span> <span class="keyword">SET</span> <span class="operator">=</span> utf8mb4 <span class="keyword">COLLATE</span> <span class="operator">=</span> utf8mb4_general_ci ROW_FORMAT <span class="operator">=</span> Compact</span><br></pre></td></tr></table></figure>
-<p>每签到一次需要使用(8 + 8 + 1 + 1 + 3 + 1)共<strong>22</strong>字节的内存，一个月则最多需要<strong>600多</strong>字节</p>
-<p><strong>那么，如果用BitMap呢？</strong><br>我们按越来统计用户签到信息，签到记为<code>1</code>，未签到则记为<code>0</code><br>把每一个bit位对应当月的每一天，形成映射关系。<br>每个用户每个月仅消耗<strong>4字节不到</strong>！</p>
-<h2 id="如何实现BitMap"><a href="#如何实现BitMap" class="headerlink" title="如何实现BitMap"></a>如何实现BitMap</h2><p>Redis是利用<code>string</code>类型数据结构实现BitMap，因此最大上限是512M，转换为bit则是2 ^ 32 个bit位。<br>常用的指令有如下：</p>
-<ul>
-<li><code>SETBIT</code>：向指定位置（offset）存入一个0或1</li>
-<li><code>GETBIT</code> ：获取指定位置（offset）的bit值</li>
-<li><code>BITCOUNT</code> ：统计BitMap中值为1的bit位的数量</li>
-<li><code>BITFIELD</code> ：操作（查询、修改、自增）BitMap中bit数组中的指定位置（offset）的值</li>
-<li><code>BITFIELD_RO</code> ：获取BitMap中bit数组，并以十进制形式返回</li>
-<li><code>BITOP</code> ：将多个BitMap的结果做位运算（与 、或、异或）</li>
-<li><code>BITPOS</code> ：查找bit数组中指定范围内第一个0或1出现的位置</li>
+<h3 id="分布式的优势"><a href="#分布式的优势" class="headerlink" title="分布式的优势"></a>分布式的优势</h3><ul>
+<li><strong>数据持久化</strong>，消息队列把消息存储在硬盘里，因此重启服务器后消息不会丢失</li>
+<li><strong>可拓展性</strong>，这意味着可以通过增加机器来提升服务器的消息处理能力</li>
+<li><strong>应用解耦</strong>，这是只有在分布式场景下才能实现的功能，它允许各个使用不同语言框架开发的系统之间进行灵活的数据传输与读取</li>
 </ul>
-<h2 id="怎么用BitMap实现签到"><a href="#怎么用BitMap实现签到" class="headerlink" title="怎么用BitMap实现签到"></a>怎么用BitMap实现签到</h2><p>实现签到功能时，业务流程如下：</p>
-<ol>
-<li>获取当前登录用户</li>
-<li>获取日期</li>
-<li>拼接key</li>
-<li>获取今天是本月第几天</li>
-<li>写入redis SETBIT key offset 1|0</li>
-</ol>
-<p>代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sign</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前用户</span></span><br><span class="line">    <span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> UserHolder.getUser().getId();</span><br><span class="line">    <span class="comment">// 获取日期</span></span><br><span class="line">    <span class="type">LocalDateTime</span> <span class="variable">curTime</span> <span class="operator">=</span> LocalDateTime.now();</span><br><span class="line">    <span class="comment">// 拼接key</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.USER_SIGN_KEY +</span><br><span class="line">            userId +</span><br><span class="line">            curTime.format(DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy:MM&quot;</span>));</span><br><span class="line">    <span class="comment">// 获取是第几天</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">offsetDay</span> <span class="operator">=</span> curTime.getDayOfMonth() - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 写入Redis SETBIT key offset 1</span></span><br><span class="line">    stringRedisTemplate.opsForValue().setBit(key, offsetDay, <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="消息队列的实现"><a href="#消息队列的实现" class="headerlink" title="消息队列的实现"></a>消息队列的实现</h2><p>这里我们选择 RabbitMq ，因为他比较容易上手，其他各方面表现也不错</p>
+<h3 id="初始化交换机（exchange），队列（queue）和-channel"><a href="#初始化交换机（exchange），队列（queue）和-channel" class="headerlink" title="初始化交换机（exchange），队列（queue）和 channel"></a>初始化交换机（exchange），队列（queue）和 channel</h3><p>因为只有一个队列、一个生产者和一个消费者，所以这里我们路由方式选择 direct ，确认方式选择手动（MANUAL）<br>先成名一个常量类，防止后续出现硬编码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">BiMqConstant</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">BI_EXCHANGE</span> <span class="operator">=</span> <span class="string">&quot;bi_exchange&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">String</span> <span class="variable">BI_QUEUE_NAME</span> <span class="operator">=</span> <span class="string">&quot;bi_queue&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">String</span> <span class="variable">BI_ROUTING_KEY</span> <span class="operator">=</span> <span class="string">&quot;bi_routingKey&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后再一个 <code>main</code> 函数中实现初始化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BiMqInit</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">ConnectionFactory</span> <span class="variable">factory</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ConnectionFactory</span>();</span><br><span class="line">            factory.setHost(<span class="string">&quot;localhost&quot;</span>);</span><br><span class="line">            <span class="type">Connection</span> <span class="variable">connection</span> <span class="operator">=</span> factory.newConnection();</span><br><span class="line">            <span class="type">Channel</span> <span class="variable">channel</span> <span class="operator">=</span> connection.createChannel();</span><br><span class="line">            <span class="comment">// 声明交换机</span></span><br><span class="line">            channel.exchangeDeclare(BiMqConstant.BI_EXCHANGE, <span class="string">&quot;direct&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 创建队列</span></span><br><span class="line">            channel.queueDeclare(BiMqConstant.BI_QUEUE_NAME, <span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">null</span>);</span><br><span class="line">            <span class="comment">// 绑定队列、交换机和路由键</span></span><br><span class="line">            channel.queueBind(BiMqConstant.BI_QUEUE_NAME, BiMqConstant.BI_EXCHANGE, BiMqConstant.BI_ROUTING_KEY);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException | TimeoutException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="怎么统计连续签到天数"><a href="#怎么统计连续签到天数" class="headerlink" title="怎么统计连续签到天数"></a>怎么统计连续签到天数</h2><p>先获取这个月的签到数据，然后从前往后统计<br>实现很简单，直接上代码了</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Integer <span class="title function_">signCount</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 获取本月今天为止的所有签到记录</span></span><br><span class="line">    <span class="comment">// 获取当前用户</span></span><br><span class="line">    <span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> UserHolder.getUser().getId();</span><br><span class="line">    <span class="comment">// 获取日期</span></span><br><span class="line">    <span class="type">LocalDateTime</span> <span class="variable">curTime</span> <span class="operator">=</span> LocalDateTime.now();</span><br><span class="line">    <span class="comment">// 拼接key</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> RedisConstants.USER_SIGN_KEY +</span><br><span class="line">            userId +</span><br><span class="line">            curTime.format(DateTimeFormatter.ofPattern(<span class="string">&quot;yyyy:MM&quot;</span>));</span><br><span class="line">    <span class="comment">// 获取是第几天</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">offsetDay</span> <span class="operator">=</span> curTime.getDayOfMonth();</span><br><span class="line">    List&lt;Long&gt; result = stringRedisTemplate.opsForValue().bitField(</span><br><span class="line">            key,</span><br><span class="line">            BitFieldSubCommands.create().get(BitFieldSubCommands.BitFieldType.unsigned(offsetDay)).valueAt(<span class="number">0</span>)</span><br><span class="line">    );</span><br><span class="line">    <span class="comment">// 得到最后有多少连续0</span></span><br><span class="line">    <span class="keyword">if</span> (result == <span class="literal">null</span> || result.isEmpty()) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">num</span> <span class="operator">=</span> result.get(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (num == <span class="literal">null</span> || num == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">cnt</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ((num &amp; <span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">        num &gt;&gt;&gt;= <span class="number">1</span>; <span class="comment">// 无论正负，高位都是补0</span></span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cnt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><del>这个功能有个bug，无法统计这个月之前的签到天数</del></p>
-<p>于是，签到功能就写完啦</p>
+<h3 id="生产者实现"><a href="#生产者实现" class="headerlink" title="生产者实现"></a>生产者实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BiMessageProducer</span> &#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> RabbitTemplate rabbitTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sendMessage</span><span class="params">(String exchange, String routingKey, String message)</span> &#123;</span><br><span class="line">        rabbitTemplate.convertAndSend(exchange, routingKey, message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实都不需要自己去做封装，直接调用都可以</p>
+<h3 id="消费者实现"><a href="#消费者实现" class="headerlink" title="消费者实现"></a>消费者实现</h3><p>Spring 提供了 RabbitMq 的封装，所以只需要按照下面这样写就好了<br>优点是使用方便<br>缺点是不够灵活</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BiMessageConsumer</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">rejectMessage</span><span class="params">(Channel channel, <span class="type">long</span> deliveryTag)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            channel.basicNack(deliveryTag, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(ErrorCode.SYSTEM_ERROR, <span class="string">&quot;消息拒绝失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@RabbitListener(queues = &#123;BiMqConstant.BI_QUEUE_NAME&#125;, ackMode = &quot;MANUAL&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">receiveMessage</span><span class="params">(String message, Channel channel, <span class="meta">@Header(AmqpHeaders.DELIVERY_TAG)</span> <span class="type">long</span> deliveryTag)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isBlank(message)) &#123;</span><br><span class="line">            rejectMessage(channel, deliveryTag);</span><br><span class="line">        &#125;</span><br><span class="line">        log.info(<span class="string">&quot;receivedMessage message = &#123;&#125;&quot;</span>, message);</span><br><span class="line">        <span class="keyword">try</span> &#123;<span class="comment">// 业务逻辑</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// 拒绝消息</span></span><br><span class="line">            rejectMessage(channel, deliveryTag);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 确认消息</span></span><br><span class="line">            channel.basicAck(deliveryTag, <span class="literal">false</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(ErrorCode.SYSTEM_ERROR, <span class="string">&quot;消息确认失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
         
       </div>
@@ -375,27 +370,22 @@
   
     
 <nav id="article-nav">
-  <a class="article-nav-btn left "
-    
-      href="/2024/05/27/HyperLogLog%E5%AE%9E%E7%8E%B0UV%E7%BB%9F%E8%AE%A1/"
-      title="HyperLogLog实现UV统计"
+  <a class="article-nav-btn left  disabled "
      >
     <i class="fa-solid fa-angle-left"></i>
     <p class="title-text">
-      
-        HyperLogLog实现UV统计
         
     </p>
   </a>
   <a class="article-nav-btn right "
     
-      href="/2024/05/26/%E4%BD%BF%E7%94%A8GEO%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9E%E7%8E%B0%E9%99%84%E8%BF%91%E5%95%86%E9%93%BA%E5%8A%9F%E8%83%BD/"
-      title="使用GEO数据结构实现附近商铺功能"
+      href="/2024/07/30/%E5%88%AB%E8%AE%A9%E7%94%A8%E6%88%B7%E7%AD%89%E5%A4%AA%E4%B9%85%EF%BC%8C%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5/"
+      title="别让用户等太久，用线程池实现异步"
      >
 
     <p class="title-text">
       
-        使用GEO数据结构实现附近商铺功能
+        别让用户等太久，用线程池实现异步
         
     </p>
     <i class="fa-solid fa-angle-right"></i>
